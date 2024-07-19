@@ -47,7 +47,8 @@
                             <div class="block-content p-3 bg-body-light">
                                 <div class="fs-2 fw-bold mb-1">
                                     Rp {{ number_format($d->harga,0,',','.') }}</div>
-                                <div class="fs-5 text-muted">per bulan</div>
+                                <div class="fs-5 text-muted mb-2">per bulan</div>
+                                <p class="text-sm mb-2">{{ $d->deskripsi }}</p>
                             </div>
                             <div class="block-content text-start">
                                 <ul class="fa-ul">
