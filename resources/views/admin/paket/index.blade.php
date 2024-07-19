@@ -1,14 +1,18 @@
 <x-app-layout>
-    <div class="content">
-        <div class="content-heading d-flex justify-content-between align-items-center">
-            <span>Paket</span>
-            <div class="space-x-1">
-                <a href="{{ route('admin.paket.create') }}" class="btn btn-sm btn-gd-main">
-                    <i class="fa fa-plus me-1"></i>
-                    Tambah Paket
-                </a>
+    <div class="bg-gd-dusk">
+        <div class="content text-center">
+            <div class="py-5">
+                <h1 class="fw-bold text-white mb-2">Kelola Project</h1>
+                <div class="text-center">
+                    <a href="{{ route('admin.paket.create') }}" class="btn rounded-pill btn-alt-primary">
+                        <i class="fa fa-plus me-1"></i>
+                        Tambah
+                    </a>
+                </div>
             </div>
         </div>
+    </div>
+    <div class="content">
         <div class="block block-rounded">
             <div class="block-content p-3">
                 <table class="table table-bordered datatable w-100">

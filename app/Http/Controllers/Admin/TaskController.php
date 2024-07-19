@@ -11,10 +11,9 @@ use Storage;
 use DataTables;
 
 use App\Models\User;
-use App\Models\Training;
-use App\Models\UserTraining;
+use App\Models\Task;
 
-class PembayaranController extends Controller
+class TaskController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -23,8 +22,13 @@ class PembayaranController extends Controller
      */
     public function index(Request $request)
     {
+
         if ($request->ajax()) {
-            $data = UserTraining::with(['user', 'training'])
+            $project_id = $request->project_id;
+            $data = Task::with(['project'])
+            ->when(isset($project_id), function($q) use($project_id){
+                return $q->where('project_id', $project_id);
+            })
             ->orderBy('id', 'DESC')->get();
 
             return DataTables::of($data)
@@ -33,19 +37,14 @@ class PembayaranController extends Controller
                     $btn = '<button type="button" class="btn btn-primary btn-sm" onclick="modalShow('. $row->id .')">Detail</a>';
                     return $btn; 
                 })
-                ->editColumn('tgl', function ($row) {
-                    $tgl =  Carbon::parse($row->tgl)->translatedFormat('d F Y');
+                ->editColumn('tgl_tempo', function ($row) {
+                    $tgl =  Carbon::parse($row->tgl_tempo)->translatedFormat('d F Y');
                     return $tgl;
                 })
-                ->editColumn('created_at', function ($row) {
-                    $tgl = Carbon::parse($row->created_at);
+                ->editColumn('tgl_upload', function ($row) {
+                    $tgl = Carbon::parse($row->tgl_upload);
 
-                    return $tgl->translatedFormat('d M Y');
-                })
-                ->editColumn('harga', function ($row) {
-                    $harga = ($row->training->harga) ? 'Rp '.number_format($row->training->harga,0,',','.') : 'Gratis';
-
-                    return $harga;
+                    return $tgl->translatedFormat('d F Y H:i');
                 })
                 ->editColumn('status', function ($row) {
                     if($row->status == 'belum bayar'){
@@ -77,22 +76,18 @@ class PembayaranController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
-        $booking = Booking::where('id', $request->booking_id)
-        ->withSum([ 'bayar' => fn ($query) => $query->where('status', 'setuju')], 'jumlah')
-        ->first();
-        $max = $booking->total_bayar - $booking->bayar_sum_jumlah;
         $rules = [
-            'tgl' => 'required',
-            'jumlah' => 'required|max:'.$max,
-            'bukti' => 'required',
+            'nama' => 'required',
+            'link_brief' => 'required',
+            'tgl_tempo' => 'required',
+            'tgl_upload' => 'required',
         ];
 
         $pesan = [
-            'tgl.required' => 'Tanggal Bayar Wajib Diisi!',
-            'jumlah.required' => 'Jumlah Wajib Diisi!',
-            'jumlah.max' => 'Jumlah Pembayaran Maksimal Rp '.number_format($max,0,',','.'),
-            'bukti.required' => 'Bukti Pembayaran Wajib Diisi!',
+            'nama.required' => 'Nama tugas harus diisi!',
+            'link_brief.required' => 'Link brief harus diisi!',
+            'tgl_tempo.required' => 'Tanggal tempo harus diisi!',
+            'tgl_upload.required' => 'Tanggal upload harus diisi!',
         ];
 
         $validator = Validator::make($request->all(), $rules, $pesan);
@@ -104,22 +99,21 @@ class PembayaranController extends Controller
         }else{
             DB::beginTransaction();
             try{
-                $data = new Payment();
-                $data->booking_id = $request->booking_id;
-                $data->tgl = Carbon::parse($request->tgl);
-                $data->jumlah = $request->jumlah;
+                $data = new Task();
+                $data->project_id = $request->project_id;
+                $data->nama = $request->nama;
+                $data->link_brief = $request->link_brief;
+                $data->tgl_tempo = $request->tgl_tempo;
+                $data->tgl_upload = $request->tgl_upload;
                 $data->status = 'pending';
+                $data->status_upload = 0;
 
-                if($request->bukti){
-                    $fileName = time() . '.' . $request->bukti->extension();
-                    Storage::disk('public')->putFileAs('uploads/pembayaran', $request->bukti, $fileName);
-                    $data->bukti = '/uploads/pembayaran/'.$fileName;
-                }
+                // if($request->file){
+                //     $fileName = time() . '.' . $request->file->extension();
+                //     Storage::disk('public')->putFileAs('uploads/pembayaran', $request->file, $fileName);
+                //     $data->file = '/uploads/task/'.$fileName;
+                // }
                 $data->save();
-
-                $booking = Booking::where('id', $request->booking_id)->first();
-                $booking->status = 'pending';
-                $booking->save();
 
             }catch(\QueryException $e){
                 DB::rollback();

@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Storage;
 use Carbon\Carbon;
-use App\Models\Paket;
+use App\Models\Order;
 
 
 class OrderController extends Controller
@@ -22,38 +22,16 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = Paket::latest()->get();
+            $data = Order::with(['user', 'paket'])->latest()->get();
 
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function($row){
-                    $btn = '<div class="dropdown">
-                        <button type="button" class="btn btn-outline-primary btn-sm dropdown-toggle" id="dropdown-default-outline-primary" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Aksi
-                        </button>
-                        <div class="dropdown-menu fs-sm" aria-labelledby="dropdown-default-outline-primary" style="">';
-                        $btn .= '<a class="dropdown-item" href="'. route('admin.paket.edit', $row->id).'"><i class="si si-note me-1"></i>Ubah</a>';
-                        $btn .= '<a class="dropdown-item" href="javascript:void(0)" onclick="hapus('. $row->id.')"><i class="si si-trash me-1"></i>Hapus</a>';
-                    $btn .= '</div></div>';
+                    $btn = '<a class="btn btn-gd-main" href="'. route('admin.order.show', $row->id).'"><i class="si si-eye me-1"></i>Detail</a>';
                     return $btn; 
                 })
-                ->editColumn('tgl_training', function ($row) {
-                    $tgl_mulai = Carbon::parse($row->tgl_mulai);
-                    $tgl_selesai = Carbon::parse($row->tgl_selesai);
-                    if($tgl_mulai->eq($tgl_selesai) || $row->tgl_selesai == null){
-                        return $tgl_mulai->translatedformat('d M Y');
-                    }else{
-                        return $tgl_mulai->translatedformat('d') . ' - '. $tgl_selesai->translatedformat('d M Y');
-                    }
-                })
-                ->editColumn('tgl_daftar', function ($row) {
-                    $tgl_mulai = Carbon::parse($row->tgl_mulai_daftar);
-                    $tgl_selesai = Carbon::parse($row->tgl_selesai_daftar);
-                    if($tgl_mulai->eq($tgl_selesai) || $row->tgl_selesai_daftar == null){
-                        return $tgl_mulai->translatedformat('d M Y');
-                    }else{
-                        return $tgl_mulai->translatedformat('d M') . ' - '. $tgl_selesai->translatedformat('d M Y');
-                    }
+                ->editColumn('tgl', function ($row) {
+                    return Carbon::parse($row->tgl)->translatedformat('d M Y');
                 })
                 ->editColumn('status', function ($row) {
                     if($row->status == 'draft'){
@@ -67,7 +45,7 @@ class OrderController extends Controller
                 ->rawColumns(['action', 'status']) 
                 ->make(true);
         }
-        return view('admin.paket.index');
+        return view('admin.order.index');
     }
 
     /**
@@ -77,7 +55,7 @@ class OrderController extends Controller
      */
     public function create()
     {
-        return view('admin.paket.create',[
+        return view('admin.order.create',[
         ]);
     }
 
@@ -89,19 +67,18 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        // dd(json_decode($request->fitur));
         $rules = [
-            'nama' => 'required',
-            'deskripsi' => 'required',
-            'harga' => 'required',
-            'fitur' => 'required',
+            'user_id' => 'required',
+            'paket_id' => 'required',
+            'tgl' => 'required',
+            'durasi' => 'required',
         ];
 
         $pesan = [
-            'nama.required' => 'Nama harus diisi!',
-            'deskripsi.required' => 'Deskripsi harus diisi!',
-            'harga.required' => 'Harga / Bulan harus diisi!',
-            'fitur.required' => 'Fitur harus diisi!',
+            'user_id.required' => 'Konsumen harus diisi!',
+            'paket_id.required' => 'Paket harus diisi!',
+            'tgl.required' => 'Tanggal harus diisi!',
+            'durasi.required' => 'Durasi harus diisi!',
         ];
 
         $validator = Validator::make($request->all(), $rules, $pesan);
@@ -110,11 +87,14 @@ class OrderController extends Controller
         }else{
             DB::beginTransaction();
             try{
-                $data = new Paket();
-                $data->nama = $request->nama;
+                $data = new Order();
+                $data->nomor = $this->getNumber();
+                $data->user_id = $request->user_id;
+                $data->paket_id = $request->paket_id;
+                $data->durasi = $request->durasi;
+                $data->tgl = $request->tgl;
                 $data->harga = $request->harga;
-                $data->deskripsi = $request->deskripsi;
-                $data->fitur = $request->fitur;
+                $data->total = $request->total;
                 $data->save();
 
             }catch(\QueryException $e){
@@ -123,7 +103,7 @@ class OrderController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('admin.paket.index');
+            return redirect()->route('admin.order.index');
         }
     }
 
@@ -135,7 +115,11 @@ class OrderController extends Controller
      */
     public function show($id)
     {
-        //
+        $data = Order::where('id', $id)->first();
+        // dd();
+        return view('admin.order.show',[
+            'data' => $data,
+        ]);
     }
 
     /**
@@ -146,9 +130,9 @@ class OrderController extends Controller
      */
     public function edit($id)
     {
-        $data = Paket::where('id', $id)->first();
+        $data = Order::where('id', $id)->first();
         // dd();
-        return view('admin.paket.edit',[
+        return view('admin.order.edit',[
             'data' => $data,
         ]);
     }
@@ -163,17 +147,17 @@ class OrderController extends Controller
     public function update(Request $request, $id)
     {
         $rules = [
-            'nama' => 'required',
-            'deskripsi' => 'required',
-            'harga' => 'required',
-            'fitur' => 'required',
+            'user_id' => 'required',
+            'paket_id' => 'required',
+            'tgl' => 'required',
+            'durasi' => 'required',
         ];
 
         $pesan = [
-            'nama.required' => 'Nama harus diisi!',
-            'deskripsi.required' => 'Deskripsi harus diisi!',
-            'harga.required' => 'Harga / Bulan harus diisi!',
-            'fitur.required' => 'Fitur harus diisi!',
+            'user_id.required' => 'Konsumen harus diisi!',
+            'paket_id.required' => 'Paket harus diisi!',
+            'tgl.required' => 'Tanggal harus diisi!',
+            'durasi.required' => 'Durasi harus diisi!',
         ];
         
         $validator = Validator::make($request->all(), $rules, $pesan);
@@ -183,11 +167,13 @@ class OrderController extends Controller
             DB::beginTransaction();
             try{
                 
-                $data = Paket::where('id', $id)->first();
-                $data->nama = $request->nama;
+                $data = Order::where('id', $id)->first();
+                $data->user_id = $request->user_id;
+                $data->paket_id = $request->paket_id;
+                $data->durasi = $request->durasi;
+                $data->tgl = $request->tgl;
                 $data->harga = $request->harga;
-                $data->deskripsi = $request->deskripsi;
-                $data->fitur = $request->fitur;
+                $data->total = $request->total;
                 $data->save();
 
             }catch(\QueryException $e){
@@ -196,7 +182,7 @@ class OrderController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('admin.paket.index');
+            return redirect()->route('admin.order.index');
         }
     }
 
@@ -211,7 +197,7 @@ class OrderController extends Controller
         DB::beginTransaction();
         try{
 
-            $data = Training::where('id', $id)->first();
+            $data = Order::where('id', $id)->first();
             $data->delete();
 
         }catch(\QueryException $e){
@@ -276,52 +262,60 @@ class OrderController extends Controller
     }
 
     
-    public function peserta($id, Request $request)
+    private function getNumber()
     {
-        if ($request->ajax()) {
-            $query = UserTraining::with('user')->where('training_id', $id)->get();
+        $q = Order::select(DB::raw('MAX(RIGHT(nomor,5)) AS kd_max'));
 
-            return DataTables::of($query)
-                ->addIndexColumn()
-                ->addColumn('action', function($row){
-                    $btn = '<div class="dropdown">
-                        <button type="button" class="btn btn-outline-primary btn-sm dropdown-toggle" id="dropdown-default-outline-primary" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Aksi
-                        </button>
-                        <div class="dropdown-menu fs-sm" aria-labelledby="dropdown-default-outline-primary" style="">';
-                        $btn .= '<a class="dropdown-item" href="'. route('admin.paket.edit', $row->id).'"><i class="si si-note me-1"></i>Ubah</a>';
-                        $btn .= '<a class="dropdown-item" href="javascript:void(0)" onclick="hapus('. $row->id.')"><i class="si si-trash me-1"></i>Hapus</a>';
-                    $btn .= '</div></div>';
-                    return $btn; 
-                })
-                ->editColumn('tgl_training', function ($row) {
-                    $tgl_mulai = Carbon::parse($row->tgl_mulai);
-                    $tgl_selesai = Carbon::parse($row->tgl_selesai);
-                    if($tgl_mulai->eq($tgl_selesai) || $row->tgl_selesai == null){
-                        return $tgl_mulai->translatedformat('d M Y');
-                    }else{
-                        return $tgl_mulai->translatedformat('d') . ' - '. $tgl_selesai->translatedformat('d M Y');
-                    }
-                })
-                ->editColumn('tgl_daftar', function ($row) {
-                    $tgl_mulai = Carbon::parse($row->tgl_mulai_daftar);
-                    $tgl_selesai = Carbon::parse($row->tgl_selesai_daftar);
-                    if($tgl_mulai->eq($tgl_selesai) || $row->tgl_selesai_daftar == null){
-                        return $tgl_mulai->translatedformat('d M Y');
-                    }else{
-                        return $tgl_mulai->translatedformat('d M') . ' - '. $tgl_selesai->translatedformat('d M Y');
-                    }
-                })
-                ->rawColumns(['action',]) 
-                ->make(true);
+        $code = 'ORD.';
+        $no = 1;
+        date_default_timezone_set('Asia/Jakarta');
+
+        if($q->count() > 0){
+            foreach($q->get() as $k){
+                return $code . date('ym') .'-'.sprintf("%05s", abs(((int)$k->kd_max) + 1));
+            }
+        }else{
+            return $code . date('ym') .'-'. sprintf("%05s", $no);
+        }
+    }
+
+    
+    public function select(Request $request)
+    {
+        // dd($request->user_id);
+        // if(!isset($request->searchTerm)){
+        //     $fetchData = Order::
+        //     orderBy('created_at', 'DESC')
+        //     ->get();
+        //   }else{
+            $cari = $request->searchTerm;
+            $user_id = $request->user_id;
+            $fetchData = Order::
+            when(isset($cari), function($q) use($cari){
+                return $q->where('nomor','LIKE',  '%' . $cari .'%');
+            })->when(isset($user_id), function($q) use($user_id){
+                return $q->where('user_id', $user_id);
+            })
+            ->orderBy('created_at', 'DESC')->get();
+        //   }
+
+          $data = array();
+          foreach($fetchData as $row) {
+            $data[] = array("id" =>$row->id, "text"=> $row->nomor);
+          }
+
+          return response()->json($data);
+    }
+
+    
+    public function json(Request $request)
+    {
+        if(!isset($request->id)){
+            $data = Order::where('id', $request->id)->get();
+        }else{
+            $data = Order::where('id', $request->id)->first();
         }
 
-        $data = Training::where('id', $id)->first();
-        $user = User::orderBy('nama', 'ASC')->get();
-
-        return view('admin.paket.peserta',[
-            'data' => $data,
-            'user' => $user
-        ]);
+          return response()->json($data);
     }
 }

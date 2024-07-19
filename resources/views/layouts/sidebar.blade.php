@@ -29,9 +29,9 @@
                         </a>
                     </li>
                     <li class="nav-main-item">
-                        <a class="nav-main-link {{ request()->is('admin/training') ? ' active' : '' }}" href="{{ route('admin.training.index') }}">
+                        <a class="nav-main-link {{ request()->is('admin/order') ? ' active' : '' }}" href="{{ route('admin.order.index') }}">
                             <i class="nav-main-link-icon si si-energy"></i>
-                            <span class="nav-main-link-name">Produk</span>
+                            <span class="nav-main-link-name">Pemesanan</span>
                         </a>
                     </li>
                     <li class="nav-main-item">
@@ -41,7 +41,7 @@
                         </a>
                     </li>
                     <li class="nav-main-item">
-                        <a class="nav-main-link {{ request()->is('admin/pembayaran') ? ' active' : '' }}" href="{{ route('admin.payment.index') }}">
+                        <a class="nav-main-link {{ request()->is('admin/project') ? ' active' : '' }}" href="{{ route('admin.project.index') }}">
                             <i class="nav-main-link-icon si si-briefcase"></i>
                             <span class="nav-main-link-name">Proyek</span>
                         </a>

@@ -23,7 +23,7 @@
         @vite(['resources/sass/main.scss', 'resources/js/codebase/app.js', 'resources/js/app.js'])
     </head>
     <body>
-        <div id="page-container" class="sidebar-o enable-page-overlay side-scroll page-header-modern main-content-boxed">
+        <div id="page-container" class="sidebar-o enable-page-overlay side-scroll page-header-glass page-header-dark main-content-boxed side-trans-enabled">
             @include('layouts.sidebar')
 
             @include('layouts.header')

@@ -12,4 +12,10 @@ class Task extends Model
     
     protected $table = 'task';
     protected $primaryKey = 'id';
+
+
+    
+    public function project(){
+        return $this->belongsTo(Project::class, 'project_id');
+    }
 }

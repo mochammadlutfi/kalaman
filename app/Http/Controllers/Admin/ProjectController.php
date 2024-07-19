@@ -22,19 +22,12 @@ class ProjectController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = Paket::latest()->get();
+            $data = Project::with(['user', 'order'])->withCount('task')->latest()->get();
 
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function($row){
-                    $btn = '<div class="dropdown">
-                        <button type="button" class="btn btn-outline-primary btn-sm dropdown-toggle" id="dropdown-default-outline-primary" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Aksi
-                        </button>
-                        <div class="dropdown-menu fs-sm" aria-labelledby="dropdown-default-outline-primary" style="">';
-                        $btn .= '<a class="dropdown-item" href="'. route('admin.paket.edit', $row->id).'"><i class="si si-note me-1"></i>Ubah</a>';
-                        $btn .= '<a class="dropdown-item" href="javascript:void(0)" onclick="hapus('. $row->id.')"><i class="si si-trash me-1"></i>Hapus</a>';
-                    $btn .= '</div></div>';
+                    $btn = '<a class="btn btn-gd-main btn-sm" href="'. route('admin.project.show', $row->id).'"><i class="si si-eye me-1"></i>Detail</a>';
                     return $btn; 
                 })
                 ->editColumn('tgl_training', function ($row) {
@@ -67,7 +60,7 @@ class ProjectController extends Controller
                 ->rawColumns(['action', 'status']) 
                 ->make(true);
         }
-        return view('admin.paket.index');
+        return view('admin.project.index');
     }
 
     /**
@@ -77,7 +70,7 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        return view('admin.paket.create',[
+        return view('admin.project.create',[
         ]);
     }
 
@@ -89,19 +82,16 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-        // dd(json_decode($request->fitur));
         $rules = [
+            'user_id' => 'required',
+            'order_id' => 'required',
             'nama' => 'required',
-            'deskripsi' => 'required',
-            'harga' => 'required',
-            'fitur' => 'required',
         ];
 
         $pesan = [
+            'user_id.required' => 'Konsumen harus diisi!',
+            'order_id.required' => 'No Pesanan harus diisi!',
             'nama.required' => 'Nama harus diisi!',
-            'deskripsi.required' => 'Deskripsi harus diisi!',
-            'harga.required' => 'Harga / Bulan harus diisi!',
-            'fitur.required' => 'Fitur harus diisi!',
         ];
 
         $validator = Validator::make($request->all(), $rules, $pesan);
@@ -110,11 +100,10 @@ class ProjectController extends Controller
         }else{
             DB::beginTransaction();
             try{
-                $data = new Paket();
+                $data = new Project();
+                $data->order_id = $request->order_id;
+                $data->user_id = $request->user_id;
                 $data->nama = $request->nama;
-                $data->harga = $request->harga;
-                $data->deskripsi = $request->deskripsi;
-                $data->fitur = $request->fitur;
                 $data->save();
 
             }catch(\QueryException $e){
@@ -123,7 +112,7 @@ class ProjectController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('admin.paket.index');
+            return redirect()->route('admin.project.index');
         }
     }
 
@@ -135,7 +124,11 @@ class ProjectController extends Controller
      */
     public function show($id)
     {
-        //
+        $data = Project::where('id', $id)->first();
+        // dd();
+        return view('admin.project.show',[
+            'data' => $data,
+        ]);
     }
 
     /**
@@ -146,9 +139,9 @@ class ProjectController extends Controller
      */
     public function edit($id)
     {
-        $data = Paket::where('id', $id)->first();
+        $data = Project::where('id', $id)->first();
         // dd();
-        return view('admin.paket.edit',[
+        return view('admin.project.edit',[
             'data' => $data,
         ]);
     }
@@ -196,7 +189,7 @@ class ProjectController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('admin.paket.index');
+            return redirect()->route('admin.project.index');
         }
     }
 
@@ -289,7 +282,7 @@ class ProjectController extends Controller
                             Aksi
                         </button>
                         <div class="dropdown-menu fs-sm" aria-labelledby="dropdown-default-outline-primary" style="">';
-                        $btn .= '<a class="dropdown-item" href="'. route('admin.paket.edit', $row->id).'"><i class="si si-note me-1"></i>Ubah</a>';
+                        $btn .= '<a class="dropdown-item" href="'. route('admin.project.edit', $row->id).'"><i class="si si-note me-1"></i>Ubah</a>';
                         $btn .= '<a class="dropdown-item" href="javascript:void(0)" onclick="hapus('. $row->id.')"><i class="si si-trash me-1"></i>Hapus</a>';
                     $btn .= '</div></div>';
                     return $btn; 
@@ -319,7 +312,7 @@ class ProjectController extends Controller
         $data = Training::where('id', $id)->first();
         $user = User::orderBy('nama', 'ASC')->get();
 
-        return view('admin.paket.peserta',[
+        return view('admin.project.peserta',[
             'data' => $data,
             'user' => $user
         ]);

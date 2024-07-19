@@ -74,6 +74,7 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function(){
             
             Route::prefix('/konsumen')->name('user.')->group(function () {
                 Route::get('/','UserController@index')->name('index');
+                Route::post('/select','UserController@select')->name('select');
                 Route::get('/create','UserController@create')->name('create');
                 Route::post('/store','UserController@store')->name('store');
                 Route::get('/json/{id}','UserController@json')->name('json');
@@ -84,26 +85,52 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function(){
                 Route::get('/{id}/riwayat','UserController@riwayat')->name('riwayat');
             });
 
-            Route::prefix('/training')->name('training.')->group(function () {
-                Route::get('/','TrainingController@index')->name('index');
-                Route::get('/create','TrainingController@create')->name('create');
-                Route::post('/store','TrainingController@store')->name('store');
-                Route::post('/status','TrainingController@status')->name('status');
-                Route::get('/{id}','TrainingController@show')->name('show');
-                Route::get('/{id}/edit','TrainingController@edit')->name('edit');
-                Route::post('{id}/update','TrainingController@update')->name('update');
-                Route::delete('/{id}/delete','TrainingController@destroy')->name('delete');
-                Route::get('/{id}/peserta','UserTrainingController@index')->name('peserta');
-                Route::post('/{id}/peserta/store','UserTrainingController@store')->name('peserta.store');
-                Route::delete('/{id}/peserta/delete','UserTrainingController@destroy')->name('peserta.delete');
-                Route::get('/{id}/peserta/{user}/certificate','UserTrainingController@certificate')->name('peserta.certificate');
+            Route::prefix('/order')->name('order.')->group(function () {
+                Route::get('/','OrderController@index')->name('index');
+                Route::get('/create','OrderController@create')->name('create');
+                Route::post('/store','OrderController@store')->name('store');
+                Route::post('/status','OrderController@status')->name('status');
+                Route::post('/select','OrderController@select')->name('select');
+                Route::get('/json','OrderController@json')->name('json');
+                Route::get('/{id}','OrderController@show')->name('show');
+                Route::get('/{id}/edit','OrderController@edit')->name('edit');
+                Route::post('{id}/update','OrderController@update')->name('update');
+                Route::delete('/{id}/delete','OrderController@destroy')->name('delete');
+                Route::get('/{id}/peserta','UserOrderController@index')->name('peserta');
+                Route::post('/{id}/peserta/store','UserOrderController@store')->name('peserta.store');
+                Route::delete('/{id}/peserta/delete','UserOrderController@destroy')->name('peserta.delete');
+                Route::get('/{id}/peserta/{user}/certificate','UserOrderController@certificate')->name('peserta.certificate');
             });
             
+            Route::prefix('/project')->name('project.')->group(function () {
+                Route::get('/','ProjectController@index')->name('index');
+                Route::get('/tambah','ProjectController@create')->name('create');
+                Route::post('/simpan','ProjectController@store')->name('store');
+                Route::get('/{id}','ProjectController@show')->name('show');
+                Route::get('/{id}/edit','ProjectController@edit')->name('edit');
+                Route::post('{id}/confirm','ProjectController@confirm')->name('confirm');
+                Route::post('{id}/update','ProjectController@update')->name('update');
+                Route::delete('/{id}/delete','ProjectController@destroy')->name('delete');
+            });
+
+            
+            Route::prefix('/task')->name('task.')->group(function () {
+                Route::get('/','TaskController@index')->name('index');
+                Route::get('/tambah','TaskController@create')->name('create');
+                Route::post('/simpan','TaskController@store')->name('store');
+                Route::get('/{id}','TaskController@show')->name('show');
+                Route::get('/{id}/edit','TaskController@edit')->name('edit');
+                Route::post('{id}/confirm','TaskController@confirm')->name('confirm');
+                Route::post('{id}/update','TaskController@update')->name('update');
+                Route::delete('/{id}/delete','TaskController@destroy')->name('delete');
+            });
 
             Route::prefix('/paket')->name('paket.')->group(function () {
                 Route::get('/','PaketController@index')->name('index');
                 Route::get('/create','PaketController@create')->name('create');
                 Route::post('/store','PaketController@store')->name('store');
+                Route::post('/select','PaketController@select')->name('select');
+                Route::get('/json','PaketController@json')->name('json');
                 Route::get('/{id}','PaketController@show')->name('show');
                 Route::get('/{id}/edit','PaketController@edit')->name('edit');
                 Route::post('{id}/update','PaketController@update')->name('update');
@@ -131,17 +158,6 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function(){
             });
         
             
-            Route::prefix('/anggota')->name('anggota.')->group(function () {
-                Route::get('/','AnggotaController@index')->name('index');
-                Route::get('/tambah','AnggotaController@tambah')->name('tambah');
-                Route::post('/simpan','AnggotaController@simpan')->name('simpan');
-                Route::get('/baru','AnggotaController@baru')->name('baru');
-                Route::get('/{id}','AnggotaController@show')->name('show');
-                Route::get('/{id}/edit','AnggotaController@edit')->name('edit');
-                Route::post('{id}/confirm','AnggotaController@confirm')->name('confirm');
-                Route::post('{id}/update','AnggotaController@update')->name('update');
-                Route::delete('/{id}/delete','AnggotaController@destroy')->name('delete');
-            });
 
             Route::prefix('/pegawai')->name('pegawai.')->group(function () {
                 Route::get('/','PegawaiController@index')->name('index');

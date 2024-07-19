@@ -11,8 +11,7 @@ use Storage;
 use DataTables;
 
 use App\Models\User;
-use App\Models\Training;
-use App\Models\UserTraining;
+use App\Models\Pembayaran;
 
 class PembayaranController extends Controller
 {
@@ -24,7 +23,7 @@ class PembayaranController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = UserTraining::with(['user', 'training'])
+            $data = Pembayaran::with(['user', 'order'])
             ->orderBy('id', 'DESC')->get();
 
             return DataTables::of($data)
@@ -63,10 +62,7 @@ class PembayaranController extends Controller
                 ->rawColumns(['action', 'status', 'harga']) 
                 ->make(true);
         }
-        $training = Training::where('status', 'buka')->orderBy('id', 'ASC')->get();
-        return view('admin.pembayaran',[
-            'training' => $training
-        ]);
+        return view('admin.pembayaran');
     }
 
     /**

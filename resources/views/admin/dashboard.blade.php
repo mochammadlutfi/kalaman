@@ -1,5 +1,12 @@
 <x-app-layout>
-
+    <div class="bg-gd-dusk">
+        <div class="content text-center">
+            <div class="py-4 text-center">
+                <h1 class="h2 fw-bold text-white mb-2">Dashboard</h1>
+                <h2 class="h5 fw-medium text-white-75">Selamat Datang {{ auth()->guard('admin')->user()->nama }}!</h2>
+            </div>
+        </div>
+    </div>
     <div class="content">
         {{-- <div class="row">
             <!-- Row #1 -->

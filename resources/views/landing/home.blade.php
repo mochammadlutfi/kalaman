@@ -8,19 +8,13 @@
                 <div class="col-md-8 py-4 d-flex align-items-center">
                     <div class="text-center text-md-start">
                         <h1 class="fw-bold fs-2 mb-3">
-                            Next generation, multipurpose UI framework for web apps
+                            Social Profil Management
                         </h1>
                         <p class="text-muted fw-medium mb-4">
-                            Codebase is a super flexible solution built with <span class="fw-semibold">Bootstrap
-                                5</span>, <span class="fw-semibold">ES6</span> and <span
-                                class="fw-semibold">Sass</span>. Use it to save time and create all kinds of web
-                            applications with friendly and fast user interface. <span class="fw-semibold">No
-                                jQuery</span> in core. Now with a brand new <a class="fw-semibold"
-                                href="javascript:void(0)" data-toggle="layout" data-action="dark_mode_toggle">dark
-                                mode</a>.
+                            Tingkatkan penjualan bisnis Anda menggunakan Jasa Pengelolaan Media Sosial. Ada tidak perlu repot, Team Kalaman Multimedia Kreatif akan melakukannya untuk Anda.</a>.
                         </p>
-                        <a class="btn btn-alt-primary py-3 px-4" href="be_pages_dashboard.html" target="_blank">
-                            <i class="fa fa-arrow-right opacity-50 me-1"></i> Enter Dashboard
+                        <a class="btn btn-gd-main py-3 px-4" href="#harga">
+                            <i class="fa fa-arrow-right opacity-50 me-1"></i> Pesan Sekarang
                         </a>
                     </div>
                 </div>

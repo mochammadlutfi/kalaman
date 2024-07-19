@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>Kalaman Project</title>
+        <title>Kalaman Mutimedia Kreatif</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -98,8 +98,8 @@
                         </div>
                         @else
                             <div class="space-x1">
-                                <a href="{{ route('login') }}" class="btn btn-primary">Login</a>
-                                <a href="{{ route('register') }}" class="btn btn-outline-primary">Daftar</a>
+                                <a href="{{ route('login') }}" class="btn rounded-pill px-4 btn-primary">Masuk</a>
+                                <a href="{{ route('register') }}" class="btn rounded-pill px-4 btn-outline-primary">Daftar</a>
                             </div>
                         @endif
                     </div>
@@ -112,13 +112,13 @@
             <main id="main-container">
                 {{ $slot }}
             </main>
-            <footer id="page-footer" class="bg-white">
+            {{-- <footer id="page-footer" class="bg-white">
                 <div class="content py-4">
                     <div class="row">
                         <div class="col-lg-4">
                             <img src="/images/logo.png" style="width: 150px;" class="mb-3">
                             <address class="fs-sm">
-                                Xircle by US Coworking Space, Jl. Terusan Buah Batu No.33, Batununggal, Kec. Bandung Kidul, Kota Bandung, Jawa Barat 40266
+                                Jl. Kehakiman No. 05, Batununggal, Kota Bandung, Jawa Barat
                             </address>
                         </div>
                         <div class="col-lg-4">
@@ -179,7 +179,7 @@
                         </div>
                     </div>
                 </div>
-            </footer>
+            </footer> --}}
         </div>
         
         <script src="/js/jquery.min.js"></script>

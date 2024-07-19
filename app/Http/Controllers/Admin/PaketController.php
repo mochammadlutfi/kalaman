@@ -324,4 +324,35 @@ class PaketController extends Controller
             'user' => $user
         ]);
     }
+
+    
+    public function select(Request $request)
+    {
+        if(!isset($request->searchTerm)){
+            $fetchData = Paket::orderBy('created_at', 'DESC')->get();
+          }else{
+            $cari = $request->searchTerm;
+            $fetchData = Paket::where('nama','LIKE',  '%' . $cari .'%')->orderBy('created_at', 'DESC')->get();
+          }
+
+          $data = array();
+          foreach($fetchData as $row) {
+            $data[] = array("id" =>$row->id, "text"=>$row->nama);
+          }
+
+          return response()->json($data);
+    }
+
+    
+    public function json(Request $request)
+    {
+        if(!isset($request->id)){
+            $data = Paket::where('id', $request->id)->get();
+        }else{
+            $data = Paket::where('id', $request->id)->first();
+        }
+        // $query = Paket::
+
+          return response()->json($data);
+    }
 }

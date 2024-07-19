@@ -282,4 +282,23 @@ class UserController extends Controller
             'data' => $data
         ]);
     }
+
+    
+    public function select(Request $request)
+    {
+        if(!isset($request->searchTerm)){
+            $fetchData = User::orderBy('created_at', 'DESC')->get();
+          }else{
+            $cari = $request->searchTerm;
+            $fetchData = User::where('nama','LIKE',  '%' . $cari .'%')->orderBy('created_at', 'DESC')->get();
+          }
+
+          $data = array();
+          foreach($fetchData as $row) {
+            $data[] = array("id" =>$row->id, "text"=>$row->nama);
+          }
+
+          return response()->json($data);
+    }
+
 }

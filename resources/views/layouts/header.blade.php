@@ -5,7 +5,7 @@
         <div class="space-x-1">
             <!-- Toggle Sidebar -->
             <!-- Layout API, functionality initialized in Codebase() -> uiApiLayout() -->
-            <button type="button" class="btn btn-sm btn-alt-secondary" data-toggle="layout"
+            <button type="button" class="btn btn-alt-secondary btn-sm p-2 rounded-circle" data-toggle="layout"
                 data-action="sidebar_toggle">
                 <i class="fa fa-fw fa-bars"></i>
             </button>
@@ -17,7 +17,7 @@
         <div class="space-x-1">
             <!-- User Dropdown -->
             <div class="dropdown d-inline-block">
-                <button type="button" class="btn btn-sm btn-alt-secondary" id="page-header-user-dropdown"
+                <button type="button" class="btn btn-sm rounded-pill btn-alt-secondary" id="page-header-user-dropdown"
                     data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fa fa-user d-sm-none"></i>
                     <span class="d-none d-sm-inline-block fw-semibold">{{ Auth::guard('admin')->user()->nama }}</span>
