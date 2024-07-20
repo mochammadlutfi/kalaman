@@ -22,7 +22,7 @@
                             <th>Konsumen</th>
                             <th>No Pesanan</th>
                             <th>Tanggal</th>
-                            <th>Harga</th>
+                            <th>Jumlah</th>
                             <th>Status</th>
                             <th width="100px">Aksi</th>
                         </tr>
@@ -35,7 +35,7 @@
         <div class="modal" id="modal-form" aria-labelledby="modal-form" style="display: none;" aria-hidden="true">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
-                    <form id="form-payment" onsubmit="return false;" enctype="multipart/form-data">
+                    <form id="formData" onsubmit="return false;" enctype="multipart/form-data">
                         <div class="block block-rounded shadow-none mb-0">
                             <div class="block-header bg-gd-dusk">
                                 <h3 class="block-title text-white" id="modalFormTitle">Pembayaran</h3>
@@ -49,26 +49,16 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="mb-4">
-                                            <label for="field-training_id">No Pemesanan</label>
-                                            <select class="form-select" id="field-training_id" style="width: 100%;"
-                                                name="training_id" data-placeholder="Pilih Pesanan">
+                                            <label for="field-order_id">No Pemesanan</label>
+                                            <select class="form-select" id="field-order_id" style="width: 100%;"
+                                                name="order_id" data-placeholder="Pilih Pesanan">
                                             </select>
-                                            <div class="invalid-feedback" id="error-training_id">Invalid feedback</div>
+                                            <div class="invalid-feedback" id="error-order_id">Invalid feedback</div>
                                         </div>
-                                        <div class="mb-4">
-                                            <label for="field-tgl">Tanggal</label>
-                                            <input type="text" class="form-control" id="field-tgl" name="tgl"
-                                                placeholder="Masukan Tanggal">
-                                            <div class="invalid-feedback" id="error-tgl">Invalid feedback</div>
-                                        </div>
+                                        <x-input-field type="text" id="tgl" name="tgl" label="Tanggal" :required="true" isAjax/>
                                     </div>
                                     <div class="col-md-6">
-                                        <div class="mb-4">
-                                            <label for="field-jumlah">Jumlah</label>
-                                            <input type="number" value="" class="form-control" id="field-jumlah" name="jumlah"
-                                                placeholder="Masukan Jumlah">
-                                            <div class="invalid-feedback" id="error-jumlah">Invalid feedback</div>
-                                        </div>
+                                        <x-input-field type="text" id="jumlah" name="jumlah" label="Jumlah" :required="true" isAjax/>
                                         <div class="mb-4">
                                             <label class="form-label" for="field-bukti">Bukti Bayar</label>
                                             <input class="form-control" type="file" name="bukti" id="field-bukti">
@@ -78,10 +68,12 @@
                                 </div>
                             </div>
                             <div class="block-content block-content-full block-content-sm text-end border-top">
-                                <button type="button" class="btn btn-alt-secondary" data-bs-dismiss="modal">
-                                    batal
+                                <button type="button" class="btn btn-alt-danger px-4 rounded-pill" data-bs-dismiss="modal">
+                                    <i class="fa fa-times me-1"></i>
+                                    Batal
                                 </button>
-                                <button type="submit" class="btn btn-alt-primary" id="btn-simpan">
+                                <button type="submit" class="btn btn-alt-primary px-4 rounded-pill" id="btn-simpan">
+                                    <i class="fa fa-check me-1"></i>
                                     Simpan
                                 </button>
                             </div>
@@ -94,21 +86,19 @@
             aria-hidden="true">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
-                    <form id="form-payment" onsubmit="return false;" enctype="multipart/form-data">
-                        <div class="block block-rounded shadow-none mb-0">
-                            <div class="block-header block-header-default">
-                                <h3 class="block-title">Detail Pembayaran</h3>
-                                <div class="block-options">
-                                    <button type="button" class="btn-block-option" data-bs-dismiss="modal"
-                                        aria-label="Close">
-                                        <i class="fa fa-times"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="block-content fs-sm" id="detailPembayaran">
+                    <div class="block block-rounded shadow-none mb-0">
+                        <div class="block-header bg-gd-dusk">
+                            <h3 class="block-title text-white" id="modalFormTitle">Detail Pembayaran</h3>
+                            <div class="block-options">
+                                <button type="button" class="text-white btn-block-option" data-bs-dismiss="modal" aria-label="Close">
+                                    <i class="fa fa-times"></i>
+                                </button>
                             </div>
                         </div>
-                    </form>
+                        <div id="detail">
+
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -128,14 +118,14 @@
                             data: 'DT_RowIndex',
                             name: 'DT_RowIndex'
                         }, {
-                            data: 'user.nama',
-                            name: 'user.nama'
+                            data: 'order.user.nama',
+                            name: 'order.user.nama'
                         }, {
-                            data: 'order.nama',
-                            name: 'order.nama'
+                            data: 'order.nomor',
+                            name: 'order.nomor'
                         }, {
-                            data: 'created_at',
-                            name: 'created_at'
+                            data: 'tgl',
+                            name: 'tgl'
                         }, {
                             data: 'jumlah',
                             name: 'jumlah'
@@ -150,8 +140,74 @@
                 });
             });
 
-            $('#field-booking_id').select2({
-                dropdownParent: $("#modal-form")
+            
+            $('#field-order_id').select2({
+                dropdownParent: $("#modal-form"),
+                ajax: {
+                    url: "{{ route('admin.order.select') }}",
+                    type: 'POST',
+                    dataType: 'JSON',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            searchTerm: params.term,
+                            user_id : $('#field-user_id').val()
+                        };
+                    },
+                    processResults: function (response) {
+                        return {
+                            results: response
+                        };
+                    },
+                    cache: true
+                }
+            });
+        
+            $("#field-tgl").flatpickr({
+                altInput: true,
+                altFormat: "j F Y",
+                dateFormat: "Y-m-d",
+                locale : "id",
+                enableTime: false,
+                time_24hr: true
+            });
+
+            $("#formData").on("submit",function (e) {
+                e.preventDefault();
+                var fomr = $('form#formData')[0];
+                var formData = new FormData(fomr);
+                let token   = $("meta[name='csrf-token']").attr("content");
+                formData.append('_token', token);
+
+                var id = $("#field-id").val();
+                var url = (id) ? "/admin/pembayaran/"+id+"/update" : "/admin/pembayaran/store";
+
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        if (response.fail == false) {
+                            $('#datatable').DataTable().ajax.reload();
+                            const el = document.getElementById('modal-form');
+                            var myModal = bootstrap.Modal.getOrCreateInstance(el);
+                            myModal.hide();
+                            fomr.reset();
+                        } else {
+                            for (control in response.errors) {
+                                $('#field-' + control).addClass('is-invalid');
+                                $('#error-' + control).html(response.errors[control]);
+                            }
+                        }
+                    },
+                    error: function (error) {
+                    }
+
+                });
+
             });
 
             function addPayment(){
@@ -166,7 +222,7 @@
                     dataType: "html",
                     success: function (response) {
                         var el = document.getElementById('modal-show');
-                        $("#detailPembayaran").html(response);
+                        $("#detail").html(response);
                         var myModal = bootstrap.Modal.getOrCreateInstance(el);
                         myModal.show();
                     },

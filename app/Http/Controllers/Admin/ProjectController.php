@@ -137,6 +137,15 @@ class ProjectController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    public function calendar($id)
+    {
+        $data = Project::where('id', $id)->first();
+        // dd();
+        return view('admin.project.kalender',[
+            'data' => $data,
+        ]);
+    }
+
     public function edit($id)
     {
         $data = Project::where('id', $id)->first();

@@ -23,7 +23,9 @@ class PembayaranController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = Pembayaran::with(['user', 'order'])
+            $data = Pembayaran::with(['order' => function($q){
+                return $q->with('user');
+            }])
             ->orderBy('id', 'DESC')->get();
 
             return DataTables::of($data)
@@ -41,10 +43,9 @@ class PembayaranController extends Controller
 
                     return $tgl->translatedFormat('d M Y');
                 })
-                ->editColumn('harga', function ($row) {
-                    $harga = ($row->training->harga) ? 'Rp '.number_format($row->training->harga,0,',','.') : 'Gratis';
+                ->editColumn('jumlah', function ($row) {
 
-                    return $harga;
+                    return 'Rp '.number_format($row->jumlah,0,',','.');
                 })
                 ->editColumn('status', function ($row) {
                     if($row->status == 'belum bayar'){
@@ -59,7 +60,7 @@ class PembayaranController extends Controller
                         return '<span class="badge bg-secondary">Batal</span>';
                     }
                 })
-                ->rawColumns(['action', 'status', 'harga']) 
+                ->rawColumns(['action', 'status', 'jumlah']) 
                 ->make(true);
         }
         return view('admin.pembayaran');
@@ -73,21 +74,16 @@ class PembayaranController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
-        $booking = Booking::where('id', $request->booking_id)
-        ->withSum([ 'bayar' => fn ($query) => $query->where('status', 'setuju')], 'jumlah')
-        ->first();
-        $max = $booking->total_bayar - $booking->bayar_sum_jumlah;
         $rules = [
             'tgl' => 'required',
-            'jumlah' => 'required|max:'.$max,
+            'jumlah' => 'required',
             'bukti' => 'required',
         ];
 
         $pesan = [
             'tgl.required' => 'Tanggal Bayar Wajib Diisi!',
             'jumlah.required' => 'Jumlah Wajib Diisi!',
-            'jumlah.max' => 'Jumlah Pembayaran Maksimal Rp '.number_format($max,0,',','.'),
+            // 'jumlah.max' => 'Jumlah Pembayaran Maksimal Rp '.number_format($max,0,',','.'),
             'bukti.required' => 'Bukti Pembayaran Wajib Diisi!',
         ];
 
@@ -100,8 +96,8 @@ class PembayaranController extends Controller
         }else{
             DB::beginTransaction();
             try{
-                $data = new Payment();
-                $data->booking_id = $request->booking_id;
+                $data = new Pembayaran();
+                $data->order_id = $request->order_id;
                 $data->tgl = Carbon::parse($request->tgl);
                 $data->jumlah = $request->jumlah;
                 $data->status = 'pending';
@@ -112,10 +108,6 @@ class PembayaranController extends Controller
                     $data->bukti = '/uploads/pembayaran/'.$fileName;
                 }
                 $data->save();
-
-                $booking = Booking::where('id', $request->booking_id)->first();
-                $booking->status = 'pending';
-                $booking->save();
 
             }catch(\QueryException $e){
                 DB::rollback();
@@ -140,51 +132,71 @@ class PembayaranController extends Controller
      */
     public function show($id)
     {
-        $data = UserTraining::with(['user', 'training'])->where('id', $id)->first();
-        $harga = ($data->training->harga) ? 'Rp '.number_format($data->training->harga,0,',','.') : 'Gratis';
-
-        $html = '
-        <div class="row mb-3">
-            <label class="col-sm-4 fw-medium">Peserta</label>
-            <div class="col-sm-6">
-                : '. $data->user->nama .'
-            </div>
-        </div>
-        <div class="row mb-3">
-            <label class="col-sm-4 fw-medium">Training</label>
-            <div class="col-sm-6">
-                : '. $data->training->nama .'
-            </div>
-        </div>
-        <div class="row mb-3">
-            <label class="col-sm-4 fw-medium">Tanggal Bayar</label>
-            <div class="col-sm-6">
-                : '. Carbon::parse($data->tgl)->translatedFormat('d F Y') .'
-            </div>
-        </div>
-        <div class="row mb-3">
-            <label class="col-sm-4 fw-medium">Jumlah Bayar</label>
-            <div class="col-sm-6">
-                : '.$harga.'
+        $data = Pembayaran::with(['order'])->where('id', $id)->first();
+        $html = '<div class="block-content p-4">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="row mb-3">
+                        <label class="col-sm-4 fw-medium">No Pemesanan</label>
+                        <div class="col-sm-6">
+                            : '. $data->order->nomor .'
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-4 fw-medium">Konsumen</label>
+                        <div class="col-sm-6">
+                            : '. $data->order->user->nama .'
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-4 fw-medium">Tanggal Bayar</label>
+                        <div class="col-sm-6">
+                            : '. Carbon::parse($data->tgl)->translatedFormat('d F Y') .'
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-4 fw-medium">Jumlah Bayar</label>
+                        <div class="col-sm-6">
+                            : Rp '. number_format($data->jumlah,0,',','.') .'
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label>Foto</label>
+                    <img src="'. $data->bukti .'" class="img-fluid"/>
+                </div>
             </div>
         </div>';
+        
+        $action = '';
 
         if($data->status == 'pending'){
-            $html.= ' <div class="border-top py-3 text-end">
-                <button type="button" class="btn btn-alt-danger" data-bs-dismiss="modal" onclick="updateStatus('.$data->id .', `tolak`)">
-                    Tolak
-                </button>
-                <button type="submit" class="btn btn-alt-primary" id="btn-simpan" onclick="updateStatus('.$data->id .', `lunas`)">
-                    Konfirmasi
-                </button>
-            </div>';
-        }else{
-            $html.= ' <div class="border-top py-3 text-end">
-                <button type="button" class="btn btn-alt-danger" data-bs-dismiss="modal" onclick="hapus('.$data->id .')">
-                    Hapus
-                </button>
-            </div>';
+        
+        $action .= '<div class="block-content p-4 border-top border-2">
+            <div class="row justify-space-between">
+                <div class="col-md-6">
+                    <button type="button" class="btn px-4 rounded-pill btn-alt-danger" data-bs-dismiss="modal" onclick="hapus('.$data->id .')">
+                        <i class="si si-trash me-1"></i>
+                        Hapus
+                    </button>
+                </div>
+                <div class="col-md-6 text-end">
+                    <button type="button" class="btn px-4 rounded-pill btn-alt-danger" data-bs-dismiss="modal" onclick="updateStatus('.$data->id .', `tolak`)">
+                        <i class="fa fa-times me-1"></i>
+                        Tolak
+                    </button>
+                    <button type="submit" class="btn px-4 rounded-pill btn-alt-primary" id="btn-simpan" onclick="updateStatus('.$data->id .', `lunas`)">
+                        <i class="fa fa-check me-1"></i>
+                        Konfirmasi
+                    </button>
+                </div>
+            </div>
+        </div>
+        ';
         }
+
+        $html .= $action;
+
         echo $html;
     }
 

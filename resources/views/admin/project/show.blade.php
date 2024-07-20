@@ -9,8 +9,12 @@
                         <i class="fa fa-edit me-1"></i>
                         Ubah
                     </a>
+                    <a href="{{ route('admin.project.calendar', $data->id) }}" class="btn rounded-pill btn-alt-warning me-2">
+                        <i class="si si-calendar me-1"></i>
+                        Kalender
+                    </a>
                     <button type="button" class="btn rounded-pill btn-alt-danger">
-                        <i class="fa fa-close me-1"></i>
+                        <i class="si si-trash me-1"></i>
                         Hapus
                     </button>
                 </div>

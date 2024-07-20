@@ -361,26 +361,16 @@ class TaskController extends Controller
     }
 
     
-    public function cek(Request $request)
+    public function json(Request $request)
     {
-        dd($request->all());
-    }
+        // dd($request->all());
+        $project_id = $request->project_id;
+        $data = Task::select('nama as title', 'tgl_upload as start')
+        ->when(isset($project_id), function($q) use ($project_id){
+            return $q->where('project_id', $project_id);
+        })
+        ->get();
 
-    
-    private function getNumber()
-    {
-        $q = Booking::select(DB::raw('MAX(RIGHT(nomor,5)) AS kd_max'));
-
-        $code = 'BKN/';
-        $no = 1;
-        date_default_timezone_set('Asia/Jakarta');
-
-        if($q->count() > 0){
-            foreach($q->get() as $k){
-                return $code . date('ym') .'/'.sprintf("%05s", abs(((int)$k->kd_max) + 1));
-            }
-        }else{
-            return $code . date('ym') .'/'. sprintf("%05s", $no);
-        }
+        return response()->json($data);
     }
 }

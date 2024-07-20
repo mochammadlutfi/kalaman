@@ -59,11 +59,6 @@ class PembayaranController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
-        $booking = Booking::where('id', $request->booking_id)
-        ->withSum([ 'bayar' => fn ($query) => $query->where('status', 'setuju')], 'jumlah')
-        ->first();
-        $max = $booking->total_bayar - $booking->bayar_sum_jumlah;
         $rules = [
             'tgl' => 'required',
             'jumlah' => 'required|max:'.$max,

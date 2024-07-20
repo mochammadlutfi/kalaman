@@ -107,6 +107,7 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function(){
                 Route::get('/tambah','ProjectController@create')->name('create');
                 Route::post('/simpan','ProjectController@store')->name('store');
                 Route::get('/{id}','ProjectController@show')->name('show');
+                Route::get('/{id}/kalender','ProjectController@calendar')->name('calendar');
                 Route::get('/{id}/edit','ProjectController@edit')->name('edit');
                 Route::post('{id}/confirm','ProjectController@confirm')->name('confirm');
                 Route::post('{id}/update','ProjectController@update')->name('update');
@@ -116,6 +117,7 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function(){
             
             Route::prefix('/task')->name('task.')->group(function () {
                 Route::get('/','TaskController@index')->name('index');
+                Route::get('/json','TaskController@json')->name('json');
                 Route::get('/tambah','TaskController@create')->name('create');
                 Route::post('/simpan','TaskController@store')->name('store');
                 Route::get('/{id}','TaskController@show')->name('show');
@@ -156,8 +158,6 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function(){
                 Route::post('{id}/status','PembayaranController@status')->name('status');
                 Route::delete('/{id}/delete','PembayaranController@destroy')->name('delete');
             });
-        
-            
 
             Route::prefix('/pegawai')->name('pegawai.')->group(function () {
                 Route::get('/','PegawaiController@index')->name('index');
