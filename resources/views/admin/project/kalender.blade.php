@@ -33,6 +33,24 @@
             </div>
         </div>
     </div>
+    <div class="modal" id="modal-show" aria-labelledby="modal-show" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="block block-rounded shadow-none mb-0">
+                    <div class="block-header bg-gd-dusk">
+                        <h3 class="block-title text-white">Detail Tugas</h3>
+                        <div class="block-options">
+                            <button type="button" class="text-white btn-block-option" data-bs-dismiss="modal" aria-label="Close">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="detail">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
     @push('scripts')
@@ -57,10 +75,29 @@
                     failure: function() {
                         alert('there was an error while fetching events!');
                     },
+                },
+                eventClick: function(info) {
+                    detail(info.event.id);
                 }
             });
             calendar.render();
       });
+        function detail(id){
+            $.ajax({
+                url: "/admin/task/"+id,
+                type: "GET",
+                dataType: "html",
+                success: function (response) {
+                    var el = document.getElementById('modal-show');
+                    $("#detail").html(response);
+                    var myModal = bootstrap.Modal.getOrCreateInstance(el);
+                    myModal.show();
+                },
+                error: function (error) {
+                }
+
+            });
+        }
     </script>
     @endpush
 </x-app-layout>

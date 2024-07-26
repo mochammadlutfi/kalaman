@@ -95,24 +95,21 @@ class AuthController extends Controller
         $rules = [
             'nama' => 'required|string',
             'email' => 'required|email|unique:users,email',
-            'jk' => 'required',
-            'tmp_lahir' => 'required',
-            'tgl_lahir' => 'required',
+            'perusahaan' => 'required',
             'hp' => 'required',
-            'alamat' => 'required',
-            'password' => 'required',
+            'password' => 'required|same:password_conf',
+            'password_conf' => 'required'
         ];
 
         $pesan = [
-            'nama.required' => 'Nama Lengkap Wajib Diisi!',
-            'email.required' => 'Alamat Email Wajib Diisi!',
-            'email.unique' => 'Alamat Email Sudah Terdaftar!',
-            'jk.required' => 'Jenis Kelamin Wajib Diisi!',
-            'tmp_lahir.required' => 'Tempat Lahir Diisi!',
-            'tgl_lahir.required' => 'Tanggal Lahir Diisi!',
-            'hp.required' => 'No HP Wajib Diisi!',
-            'alamat.required' => 'Alamat Wajib Diisi!',
-            'password.required' => 'Password Wajib Diisi!',
+            'nama.required' => 'Nama Lengkap harus diisi',
+            'email.required' => 'Alamat Email harus diisi',
+            'email.unique' => 'Alamat Email sudah terdaftar',
+            'perusahaan.required' => 'Nama perusahaan harus diisi',
+            'hp.required' => 'No HP harus diisi',
+            'alamat.required' => 'Alamat harus diisi',
+            'password.required' => 'Password harus diisi',
+            'password_conf.required' => 'Konfirmasi Password harus diisi',
         ];
 
         $validator = Validator::make($request->all(), $rules, $pesan);
@@ -126,13 +123,8 @@ class AuthController extends Controller
                 $auth->nama = $request->nama;
                 $auth->email = $request->email;
                 $auth->password = Hash::make($request->password);
-                $auth->jk = $request->jk;
-                $auth->tmp_lahir = $request->tmp_lahir;
-                $auth->tgl_lahir = $request->tgl_lahir;
-                $auth->instansi = $request->instansi;
-                $auth->jabatan = $request->jabatan;
                 $auth->hp = $request->hp;
-                $auth->alamat = $request->alamat;
+                $auth->perusahaan = $request->perusahaan;
                 $auth->save();
 
             }catch(\QueryException $e){

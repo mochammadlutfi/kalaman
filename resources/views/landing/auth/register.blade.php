@@ -15,24 +15,29 @@
                     <div class="block-content">
                         <form method="POST" action="{{ route('register') }}">
                             @csrf
-                            <div class="mb-4">
-                                <label class="form-label" for="val-alamat">Alamat<span
-                                        class="text-danger">*</span>
-                                </label>
-                                <input type="text"
-                                    class="form-control {{ $errors->has('alamat') ? 'is-invalid' : '' }}"
-                                    id="val-alamat" name="alamat" placeholder="Masukan Alamat"
-                                    value="{{ old('nama') ?? '' }}">
-                                <x-input-error :messages="$errors->get('alamat')" class="mt-2" />
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <x-input-field type="text" id="nama" name="nama" label="Nama Lengkap"/>
+                                </div>
+                                <div class="col-md-6">
+                                    <x-input-field type="text" id="perusahaan" name="perusahaan" label="Nama Perusahaan"/>
+                                </div>
                             </div>
-                            <div class="mb-4">
-                                <label class="form-label" for="val-password">Password
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <input type="password"
-                                    class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}"
-                                    id="val-password" name="password" placeholder="Masukan password">
-                                <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <x-input-field type="email" id="email" name="email" label="Alamat Email"/>
+                                </div>
+                                <div class="col-md-6">
+                                    <x-input-field type="text" id="hp" name="hp" label="No Handphone"/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <x-input-field type="password" id="password" name="password" label="Password"/>
+                                </div>
+                                <div class="col-md-6">
+                                    <x-input-field type="password" id="password_conf" name="password_conf" label="Konfirmasi Password"/>
+                                </div>
                             </div>
                             <div class="mb-4">
                                 <button type="submit" class="btn btn-lg btn-gd-main rounded-pill fw-medium w-100">

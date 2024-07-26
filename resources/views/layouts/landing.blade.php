@@ -52,35 +52,36 @@
                         </ul>
                     </div>
                     <div class="d-flex">
-
                         @if (Auth::guard('web')->check())
                         <div class="dropdown d-inline-block">
-                            <button type="button" class="btn btn-alt-secondary" id="page-header-user-dropdown"
+                            <button type="button" class="btn btn-link" id="page-header-user-dropdown"
                                 data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fa fa-user d-sm-none"></i>
+                                <i class="fa fa-user"></i>
                                 <span class="d-none d-sm-inline-block fw-semibold">{{ Auth::guard('web')->user()->nama }}</span>
                                 <i class="fa fa-angle-down opacity-50 ms-1"></i>
                             </button>
                             <div class="dropdown-menu dropdown-menu-md dropdown-menu-end p-0"
                                 aria-labelledby="page-header-user-dropdown">
-                                <div class="px-2 py-3 bg-body-light rounded-top">
-                                    <h5 class="h6 text-center mb-0">
-                                        {{ Auth::guard('web')->user()->nama }}
-                                    </h5>
+                                <div class="p-2">
+                                    <div class="bg-gd-main p-3 rounded text-white">
+                                        <h5 class="h6 text-center mb-0">
+                                            {{ Auth::guard('web')->user()->nama }}
+                                        </h5>
+                                    </div>
                                 </div>
                                 <div class="p-2">
                                     <a class="dropdown-item d-flex align-items-center justify-content-between space-x-1"
-                                        href="{{ route('profil.edit') }}">
+                                        href="{{ route('profile.edit') }}">
                                         <span>Profil</span>
                                         <i class="fa fa-fw fa-user opacity-25"></i>
                                     </a>
                                     <a class="dropdown-item d-flex align-items-center justify-content-between space-x-1"
-                                        href="{{ route('user.training') }}">
-                                        <span>Pelatihan Saya</span>
+                                        href="{{ route('user.order') }}">
+                                        <span>Langganan Saya</span>
                                         <i class="fa fa-fw fa-user opacity-25"></i>
                                     </a>
                                     <a class="dropdown-item d-flex align-items-center justify-content-between"
-                                        href="{{ route('profil.password') }}">
+                                        href="{{ route('profile.password') }}">
                                         <span>Ubah Password</span>
                                         <i class="fa fa-fw fa-envelope-open opacity-25"></i>
                                     </a>

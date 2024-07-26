@@ -34,7 +34,15 @@ class TaskController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function($row){
-                    $btn = '<button type="button" class="btn btn-primary btn-sm" onclick="modalShow('. $row->id .')">Detail</a>';
+                    $btn = '<div class="dropdown">
+                        <button type="button" class="btn btn-primary btn-sm dropdown-toggle" id="dropdown-default-outline-primary" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Aksi
+                        </button>
+                        <div class="dropdown-menu fs-sm" aria-labelledby="dropdown-default-outline-primary" style="">';
+                        $btn .= '<a class="dropdown-item" href="javascript:void(0)" onclick="detail('. $row->id .')"><i class="si si-eye me-1"></i>Detail</a>';
+                        $btn .= '<a class="dropdown-item" href="javascript:void(0)" onclick="ubah('. $row->id.')"><i class="si si-note me-1"></i>Ubah</a>';
+                        $btn .= '<a class="dropdown-item" href="javascript:void(0)" onclick="hapus('. $row->id.')"><i class="si si-trash me-1"></i>Hapus</a>';
+                    $btn .= '</div></div>';
                     return $btn; 
                 })
                 ->editColumn('tgl_tempo', function ($row) {
@@ -59,7 +67,14 @@ class TaskController extends Controller
                         return '<span class="badge bg-secondary">Batal</span>';
                     }
                 })
-                ->rawColumns(['action', 'status', 'harga']) 
+                ->editColumn('status_upload', function ($row) {
+                    if($row->status_upload == 0){
+                        return '<span class="badge bg-danger">Belum Upload</span>';
+                    }else{
+                        return '<span class="badge bg-success">Sudah Upload</span>';
+                    }
+                })
+                ->rawColumns(['action', 'status', 'harga', 'status_upload']) 
                 ->make(true);
         }
         $training = Training::where('status', 'buka')->orderBy('id', 'ASC')->get();
@@ -138,51 +153,58 @@ class TaskController extends Controller
      */
     public function show($id)
     {
-        $data = UserTraining::with(['user', 'training'])->where('id', $id)->first();
-        $harga = ($data->training->harga) ? 'Rp '.number_format($data->training->harga,0,',','.') : 'Gratis';
+        $data = Task::where('id', $id)->first();
 
-        $html = '
-        <div class="row mb-3">
-            <label class="col-sm-4 fw-medium">Peserta</label>
-            <div class="col-sm-6">
-                : '. $data->user->nama .'
-            </div>
-        </div>
-        <div class="row mb-3">
-            <label class="col-sm-4 fw-medium">Training</label>
-            <div class="col-sm-6">
-                : '. $data->training->nama .'
-            </div>
-        </div>
-        <div class="row mb-3">
-            <label class="col-sm-4 fw-medium">Tanggal Bayar</label>
-            <div class="col-sm-6">
-                : '. Carbon::parse($data->tgl)->translatedFormat('d F Y') .'
-            </div>
-        </div>
-        <div class="row mb-3">
-            <label class="col-sm-4 fw-medium">Jumlah Bayar</label>
-            <div class="col-sm-6">
-                : '.$harga.'
+        if($data->status == 'pending'){
+            $status = '<span class="badge bg-primary">Pending</span>';
+        }else if($data->status == 'terima'){
+            $status = '<span class="badge bg-success">Diterima</span>';
+        }else if($data->status == 'tolak'){
+            $status = '<span class="badge bg-secondary">Ditolak</span>';
+        }
+        if($data->status_upload){
+            $status_upload = '<span class="badge bg-primary">Sudah Upload</span>';
+        }else {
+            $status_upload = '<span class="badge bg-danger">Belum Upload</span>';
+        }
+
+        $html = '<div class="block-content p-4">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="row mb-3">
+                        <label class="col-sm-5 fw-medium">Nama Tugas</label>
+                        <div class="col-sm-7">: '. $data->nama .'</div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-5 fw-medium">Link Brief</label>
+                        <div class="col-sm-7">: 
+                            <a href="'. $data->link_brief .'" target="_blank" class="badge bg-primary px-3 text-white">Lihat Brief</a>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-5 fw-medium">Status</label>
+                        <div class="col-sm-7">: '. $status .'</div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-5 fw-medium">Tanggal Tempo</label>
+                        <div class="col-sm-7">
+                            : '. Carbon::parse($data->tgl_tempo)->translatedFormat('d F Y') .'
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-5 fw-medium">Tanggal Upload</label>
+                        <div class="col-sm-7">
+                            : '. Carbon::parse($data->tgl_upload)->translatedFormat('d F Y H:i') .' WIB
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-5 fw-medium">Status Upload</label>
+                        <div class="col-sm-7">: '. $status_upload .'</div>
+                    </div>
+                </div>
             </div>
         </div>';
 
-        if($data->status == 'pending'){
-            $html.= ' <div class="border-top py-3 text-end">
-                <button type="button" class="btn btn-alt-danger" data-bs-dismiss="modal" onclick="updateStatus('.$data->id .', `tolak`)">
-                    Tolak
-                </button>
-                <button type="submit" class="btn btn-alt-primary" id="btn-simpan" onclick="updateStatus('.$data->id .', `lunas`)">
-                    Konfirmasi
-                </button>
-            </div>';
-        }else{
-            $html.= ' <div class="border-top py-3 text-end">
-                <button type="button" class="btn btn-alt-danger" data-bs-dismiss="modal" onclick="hapus('.$data->id .')">
-                    Hapus
-                </button>
-            </div>';
-        }
         echo $html;
     }
 
@@ -363,9 +385,8 @@ class TaskController extends Controller
     
     public function json(Request $request)
     {
-        // dd($request->all());
         $project_id = $request->project_id;
-        $data = Task::select('nama as title', 'tgl_upload as start')
+        $data = Task::select('id','nama as title', 'tgl_upload as start')
         ->when(isset($project_id), function($q) use ($project_id){
             return $q->where('project_id', $project_id);
         })

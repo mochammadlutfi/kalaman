@@ -35,7 +35,7 @@ Route::prefix('/layanan-kami')->name('services.')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/keluar','AuthController@logout')->name('logout');
     
-    Route::name('profil.')->group(function () {
+    Route::name('profile.')->group(function () {
         Route::get('/profil','ProfilController@edit')->name('edit');
         Route::post('/profil','ProfilController@update');
         
@@ -43,11 +43,14 @@ Route::middleware('auth')->group(function () {
         Route::post('/password','ProfilController@updatePassword');
     });
         
-    Route::get('/pelatihan-saya','TrainingController@user')->name('user.training');
-    Route::get('/pelatihan-saya/{id}','TrainingController@showTrans')->name('user.training.show');
-    Route::post('/pelatihan/simpan','TrainingController@register')->name('user.training.register');
-    Route::post('/pelatihan/update','TrainingController@update')->name('user.training.update');
-    Route::get('/pelatihan/certificate/{id}','TrainingController@certificate')->name('user.training.certificate');
+    Route::get('/pesanan-saya','OrderController@user')->name('user.order');
+    Route::get('/pesanan-saya/{id}','OrderController@show')->name('user.order.show');
+    Route::post('/pesanan/simpan','OrderController@register')->name('user.order.register');
+    Route::get('/pesanan/{id}/pembayaran','OrderController@payment')->name('user.order.payment');
+    Route::get('/pesanan/{id}/pembayaran/data','OrderController@paymentData')->name('user.order.payment.data');
+    Route::get('/pesanan/{id}/project','ProjectController@index')->name('user.project');
+    Route::post('/pesanan/{id}/update','OrderController@update')->name('user.order.update');    
+
     
 });
 

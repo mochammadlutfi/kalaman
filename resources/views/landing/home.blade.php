@@ -34,7 +34,7 @@
                     @foreach ($paket as $d)
                     <div class="col-md-6 col-xl-3">
                         <!-- Startup Plan -->
-                        <a class="block block-link-pop block-rounded block-bordered text-center" href="javascript:void(0)">
+                        <div class="block block-link-pop block-rounded block-bordered text-center" href="javascript:void(0)">
                             <div class="block-header">
                                 <h3 class="block-title fs-lg fw-bold">{{ $d->nama }}</h3>
                             </div>
@@ -52,16 +52,131 @@
                                 </ul>
                             </div>
                             <div class="block-content block-content-full">
-                                <span class="btn btn-gd-main">
+                                <button class="btn btn-gd-main" onclick="openModal({{ json_encode($d) }})">
                                     <i class="fa fa-arrow-up opacity-50 me-1"></i> Pesan Sekarang
-                                </span>
+                                </button>
                             </div>
-                        </a>
+                        </div>
                         <!-- END Startup Plan -->
+
+                        <!-- Modal -->
                     </div>
                     @endforeach
                 </div>
             </div>
         </div>
     </div>
+    <div class="modal fade" id="modalOrder" tabindex="-1" aria-labelledby="modalOrderLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST" action="{{ route('user.order.register') }}">
+                    @csrf
+                    <input type="hidden" name="paket_id" id="field-id"/>
+                    <input type="hidden" name="harga" id="field-harga"/>
+                    <input type="hidden" name="total" id="field-total"/>
+                    <div class="block block-rounded shadow-none mb-0">
+                        <div class="block-header block-header-default">
+                            <h3 class="block-title">Pesan Paket {{ $d->nama }}</h3>
+                            <div class="block-options">
+                                <button type="button" class="btn-block-option" data-bs-dismiss="modal"
+                                    aria-label="Close">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="block-content p-3">
+                            <div class="row mb-3">
+                                <div class="col-3 d-flex">
+                                    <div class="my-auto">
+                                        Harga
+                                    </div>
+                                </div>
+                                <div class="col-8 fw-semibold">
+                                    : <span id="showHarga">Rp 0</span> / Bulan
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-3 d-flex">
+                                    <div class="my-auto">
+                                        Durasi
+                                    </div>
+                                </div>
+                                <div class="col-8 fw-semibold d-flex">
+                                    : <select class="form-control ms-1" id="field-lama" name="lama">
+                                        @for($i =1; $i <= 12; $i++)
+                                        <option value="{{ $i }}">{{$i}} Bulan</option>
+                                        @endfor
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-3 d-flex">
+                                    <div class="my-auto">
+                                        Total
+                                    </div>
+                                </div>
+                                <div class="col-8 fw-semibold">
+                                    : <span id="showTotal">Rp 0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="block-content block-content-full block-content-sm text-end border-top">
+                            <button type="button" class="btn rounded-pill btn-danger px-3" data-bs-dismiss="modal">
+                                Batal
+                            </button>
+                            <button type="submit" class="btn rounded-pill btn-primary px-3">
+                                Lanjut Pembayaran
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    @push('scripts')
+        <script>
+            var el = $('#modalOrder');
+
+            function openModal(param){
+                console.log(param);
+                el.find('.block-title').html(`Pesan Paket ${param.nama}`);
+                el.find("#showHarga").html(formatRupiah(param.harga));
+                el.find('#field-harga').val(param.harga);
+                el.find('#field-id').val(param.id);
+
+                var total = $("#field-lama").val() * el.find("#field-harga").val();
+                el.find("#showTotal").html(formatRupiah(total));
+                el.find('#field-total').val(total);
+
+                var myModal = bootstrap.Modal.getOrCreateInstance(el);
+                myModal.show();
+            }
+
+            $("#field-lama").on('change', function(e){
+                e.preventDefault();
+
+                var total = $("#field-lama").val() * el.find("#field-harga").val();
+                el.find("#showTotal").html(formatRupiah(total));
+                el.find('#field-total').val(total);
+            });
+
+            function formatRupiah(angka, prefix){
+                var number_string = angka.toString(),
+                split   		= number_string.split(','),
+                sisa     		= split[0].length % 3,
+                rupiah     		= split[0].substr(0, sisa),
+                ribuan     		= split[0].substr(sisa).match(/\d{3}/gi);
+
+                if(ribuan){
+                    separator = sisa ? '.' : '';
+                    rupiah += separator + ribuan.join('.');
+                }
+
+                rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+                return prefix == undefined ? rupiah : (rupiah ? 'Rp ' + rupiah : '');
+            }
+        </script>
+    @endpush
 </x-landing-layout>

@@ -2,7 +2,7 @@
     <div class="bg-gd-dusk">
         <div class="content text-center">
             <div class="py-5">
-                <h1 class="fw-bold text-white mb-2">Kelola Project</h1>
+                <h1 class="fw-bold text-white mb-2">Kelola Paket Harga</h1>
                 <div class="text-center">
                     <a href="{{ route('admin.paket.create') }}" class="btn rounded-pill btn-alt-primary">
                         <i class="fa fa-plus me-1"></i>

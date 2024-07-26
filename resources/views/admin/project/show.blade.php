@@ -85,11 +85,26 @@
                                 <div class="col-md-6">
                                     <x-input-field type="text" id="nama" name="nama" label="Nama Tugas" isAjax/>
                                     <x-input-field type="text" id="tgl_tempo" name="tgl_tempo" label="Tanggal Tempo" isAjax/>
+                                    <x-select-field id="status" name="status" label="Status" isAjax :options="[
+                                        ['value' => 'Draft', 'label' => 'Draft'],
+                                        ['value' => 'Pending', 'label' => 'Pending'],
+                                        ['value' => 'Selesai', 'label' => 'Selesai'],
+                                    ]"/>
+
                                 </div>
                                 <div class="col-md-6">
                                     <x-input-field type="text" id="link_brief" name="link_brief" label="Link Brief" isAjax/>
                                     <x-input-field type="text" id="tgl_upload" name="tgl_upload" label="Tanggal Upload" isAjax/>
+                                    <x-select-field id="status_upload" name="status_upload" label="Status Upload" isAjax :options="[
+                                        ['value' => 0, 'label' => 'Belum Upload'],
+                                        ['value' => 1, 'label' => 'Sudah Upload'],
+                                    ]"/>
                                 </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label" for="field-file">Upload File</label>
+                                <input class="form-control" type="file" name="file" id="field-file">
+                                <div class="invalid-feedback" id="error-file">Invalid feedback</div>
                             </div>
                         </div>
                         <div class="block-content block-content-full block-content-sm text-end border-top">
@@ -104,6 +119,25 @@
                         </div>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="modal-show" aria-labelledby="modal-show" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="block block-rounded shadow-none mb-0">
+                    <div class="block-header bg-gd-dusk">
+                        <h3 class="block-title text-white">Detail Tugas</h3>
+                        <div class="block-options">
+                            <button type="button" class="text-white btn-block-option" data-bs-dismiss="modal" aria-label="Close">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="detail">
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -154,6 +188,23 @@
             var modalForm = bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-form'));
             $("#modalFormTitle").html('Tambah Tugas');
             modalForm.show();
+        }
+
+        function detail(id){
+            $.ajax({
+                url: "/admin/task/"+id,
+                type: "GET",
+                dataType: "html",
+                success: function (response) {
+                    var el = document.getElementById('modal-show');
+                    $("#detail").html(response);
+                    var myModal = bootstrap.Modal.getOrCreateInstance(el);
+                    myModal.show();
+                },
+                error: function (error) {
+                }
+
+            });
         }
 
         $("#field-tgl_tempo").flatpickr({

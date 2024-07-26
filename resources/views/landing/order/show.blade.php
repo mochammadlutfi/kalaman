@@ -1,23 +1,12 @@
-<x-app-layout>
-    <div class="bg-gd-dusk">
-        <div class="content content-top text-center">
-            <div class="py-4">
-                <h1 class="fw-bold text-white mb-2">Detail Pemesanan</h1>
-                <div class="d-flex justify-content-center">
-                    <a href="{{ route('admin.order.edit', $data->id) }}" class="btn rounded-pill btn-alt-primary me-2">
-                        <i class="fa fa-edit me-1"></i>
-                        Ubah
-                    </a>
-                    <button type="button" class="btn rounded-pill btn-alt-danger">
-                        <i class="fa fa-close me-1"></i>
-                        Hapus
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+<x-landing-layout>
     <div class="content">
         <div class="block block-rounded">
+            <div class="block-header bg-gd-dusk">
+                <h3 class="block-title text-white fw-semibold">Detail Pesanan</h3>
+                <div class="block-options">
+
+                </div>
+            </div>
             <div class="block-content p-4">
                 <div class="row">
                     <div class="col-md-6">
@@ -176,9 +165,26 @@
             </div>
         </div>
     </div>
-    
     @push('scripts')
-    <script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.countdown/2.2.0/jquery.countdown.min.js" integrity="sha512-lteuRD+aUENrZPTXWFRPTBcDDxIGWe5uu0apPEn+3ZKYDwDaEErIK9rvR0QzUGmUQ55KFE2RqGTVoZsKctGMVw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
+        <script>
+            $('#clock').countdown('2020/10/10 12:34:56')
+                .on('update.countdown', function(event) {
+                var format = '%H:%M:%S';
+                if(event.offset.totalDays > 0) {
+                    format = '%-d day%!d ' + format;
+                }
+                if(event.offset.weeks > 0) {
+                    format = '%-w week%!w ' + format;
+                }
+                $(this).html(event.strftime(format));
+                })
+                .on('finish.countdown', function(event) {
+                $(this).html('This offer has expired!')
+                    .parent().addClass('disabled');
+
+                });
         $(function () {
             var tablePayment = $('#tablePayment').DataTable({
                 processing: true,
@@ -186,9 +192,9 @@
                 dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>><'row'<'col-sm-12'tr>><'r" +
                         "ow'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
                 ajax: {
-                    url : "{{ route('admin.payment.index') }}",
+                    url : "{{ route('user.order.payment.data', $data->id) }}",
                     data : function(data){
-                        data.booking_id = "{{ $data->id }}";
+
                     },
                 },
                 columns: [
@@ -217,11 +223,10 @@
                     processing: true,
                     serverSide: true,
                     dom : "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>><'row'<'col-sm-12'tr>><'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
-                    ajax: "{{ route('admin.project.index') }}",
+                    ajax: "{{ route('user.project', $data->id) }}",
                     columns: [
                         {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                         {data: 'nama', name: 'nama'},
-                        {data: 'user.nama', name: 'user.nama'},
                         {data: 'order.nomor', name: 'order.nomor'},
                         {data: 'task_count', name: 'task_count'},
                         {
@@ -233,92 +238,6 @@
                     ]
                 });
         });
-
-        $("#field-tgl").flatpickr({
-            altInput: true,
-            altFormat: "j F Y",
-            dateFormat: "Y-m-d",
-            locale : "id",
-            defaultDate : new Date(),
-            minDate: "today"
-        });
-
-        function modalShow(id){
-            $.ajax({
-                url: "/admin/pembayaran/"+id,
-                type: "GET",
-                dataType: "html",
-                success: function (response) {
-                    var el = document.getElementById('modal-show');
-                    $("#detailPembayaran").html(response);
-                    var myModal = bootstrap.Modal.getOrCreateInstance(el);
-                    myModal.show();
-                },
-                error: function (error) {
-                }
-
-            });
-        }
-
-        
-        function updateStatus(id, status, booking_id){
-            // console.log(status);
-            $.ajax({
-                url: "/admin/pembayaran/"+id +"/status",
-                type: "POST",
-                data : {
-                    booking_id : booking_id,
-                    status : status,
-                    _token : $("meta[name='csrf-token']").attr("content"),
-                },
-                success: function (response) {
-                    // console.log(response);
-                    location.reload();
-                    var el = document.getElementById('modal-show');
-                    $('.datatable').DataTable().ajax.reload();
-                    // $("#detailPembayaran").html(response);
-                    var myModal = bootstrap.Modal.getOrCreateInstance(el);
-                    myModal.hide();
-                },
-                error: function (error) {
-                }
-            });
-        }
-
-        $("#form-payment").on("submit",function (e) {
-            e.preventDefault();
-            var fomr = $('form#form-payment')[0];
-            var formData = new FormData(fomr);
-            let token   = $("meta[name='csrf-token']").attr("content");
-            formData.append('_token', token);
-
-            $.ajax({
-                url: "{{ route('admin.payment.store') }}",
-                type: "POST",
-                data: formData,
-                cache: false,
-                contentType: false,
-                processData: false,
-                success: function (response) {
-                    if (response.fail == false) {
-                        $('.datatable').DataTable().ajax.reload();
-                        var myModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-normal'));
-                        myModal.hide();
-                    } else {
-                        for (control in response.errors) {
-                            $('#field-' + control).addClass('is-invalid');
-                            $('#error-' + control).html(response.errors[control]);
-                        }
-                    }
-                },
-                error: function (error) {
-                }
-
-            });
-
-        });
-    </script>
+        </script>
     @endpush
-
-</x-app-layout>
-
+</x-landing-layout>
