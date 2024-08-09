@@ -54,10 +54,10 @@ class PembayaranController extends Controller
                         return '<span class="badge bg-warning">Sebagian</span>';
                     }else if($row->status == 'pending'){
                         return '<span class="badge bg-primary">Pending</span>';
-                    }else if($row->status == 'lunas'){
-                        return '<span class="badge bg-success">Lunas</span>';
-                    }else if($row->status == 'batal'){
-                        return '<span class="badge bg-secondary">Batal</span>';
+                    }else if($row->status == 'terima'){
+                        return '<span class="badge bg-success">Diterima</span>';
+                    }else if($row->status == 'tolak'){
+                        return '<span class="badge bg-secondary">Ditolak</span>';
                     }
                 })
                 ->rawColumns(['action', 'status', 'jumlah']) 
@@ -170,30 +170,33 @@ class PembayaranController extends Controller
         
         $action = '';
 
-        if($data->status == 'pending'){
         
         $action .= '<div class="block-content p-4 border-top border-2">
             <div class="row justify-space-between">
-                <div class="col-md-6">
+                <div class="col-md-6"> 
                     <button type="button" class="btn px-4 rounded-pill btn-alt-danger" data-bs-dismiss="modal" onclick="hapus('.$data->id .')">
                         <i class="si si-trash me-1"></i>
                         Hapus
                     </button>
                 </div>
-                <div class="col-md-6 text-end">
-                    <button type="button" class="btn px-4 rounded-pill btn-alt-danger" data-bs-dismiss="modal" onclick="updateStatus('.$data->id .', `tolak`)">
-                        <i class="fa fa-times me-1"></i>
-                        Tolak
-                    </button>
-                    <button type="submit" class="btn px-4 rounded-pill btn-alt-primary" id="btn-simpan" onclick="updateStatus('.$data->id .', `lunas`)">
-                        <i class="fa fa-check me-1"></i>
-                        Konfirmasi
-                    </button>
-                </div>
+                <div class="col-md-6 text-end">';
+
+        
+        if($data->status == 'pending'){
+        $action .= '<button type="button" class="btn px-4 rounded-pill btn-alt-danger" data-bs-dismiss="modal" onclick="updateStatus('.$data->id .', `tolak`)">
+                    <i class="fa fa-times me-1"></i>
+                    Tolak
+                </button>
+                <button type="submit" class="btn px-4 rounded-pill btn-alt-primary" onclick="updateStatus('.$data->id .', `terima`)">
+                    <i class="fa fa-check me-1"></i>
+                    Konfirmasi
+                </button>';
+
+        }
+                '</div>
             </div>
         </div>
         ';
-        }
 
         $html .= $action;
 
@@ -205,7 +208,7 @@ class PembayaranController extends Controller
     {
         DB::beginTransaction();
         try{
-            $data = UserTraining::where('id', $id)->first();
+            $data = Pembayaran::where('id', $id)->first();
             $data->status = $request->status;
             $data->save();
         }catch(\QueryException $e){
@@ -319,7 +322,7 @@ class PembayaranController extends Controller
         DB::beginTransaction();
         try{
 
-            $data = UserTraining::where('id', $id)->first();
+            $data = Pembayaran::where('id', $id)->first();
             $data->delete();
 
         }catch(\QueryException $e){

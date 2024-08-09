@@ -40,7 +40,7 @@ class TaskController extends Controller
                         </button>
                         <div class="dropdown-menu fs-sm" aria-labelledby="dropdown-default-outline-primary" style="">';
                         $btn .= '<a class="dropdown-item" href="javascript:void(0)" onclick="detail('. $row->id .')"><i class="si si-eye me-1"></i>Detail</a>';
-                        $btn .= '<a class="dropdown-item" href="javascript:void(0)" onclick="ubah('. $row->id.')"><i class="si si-note me-1"></i>Ubah</a>';
+                        $btn .= '<a class="dropdown-item" href="javascript:void(0)" onclick="ubah('. json_encode($row) .')"><i class="si si-note me-1"></i>Ubah</a>';
                         $btn .= '<a class="dropdown-item" href="javascript:void(0)" onclick="hapus('. $row->id.')"><i class="si si-trash me-1"></i>Hapus</a>';
                     $btn .= '</div></div>';
                     return $btn; 

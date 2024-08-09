@@ -21,9 +21,9 @@
                             <th width="300px">Nomor</th>
                             <th width="400px">Konsumen</th>
                             <th width="200px">Paket</th>
-                            <th width="200px">Tanggal</th>
+                            <th width="200px">Tgl Pemesanan</th>
                             <th width="200px">Durasi</th>
-                            <th width="200px">Status</th>
+                            <th width="200px">Tgl Selesai</th>
                             <th width="60px">Aksi</th>
                         </tr>
                     </thead>
@@ -48,7 +48,7 @@
                         {data: 'paket.nama', name: 'paket.nama'},
                         {data: 'tgl', name: 'tgl'},
                         {data: 'durasi', name: 'durasi'},
-                        {data: 'status', name: 'status'},
+                        {data: 'tgl_selesai', name: 'tgl_selesai'},
                         {
                             data: 'action', 
                             name: 'action', 

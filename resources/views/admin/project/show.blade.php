@@ -207,6 +207,13 @@
             });
         }
 
+        function edit(data){
+            var modalForm = bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-form'));
+            $("#modalFormTitle").html('Ubah Tugas');
+            modalForm.show();
+        }
+
+        
         $("#field-tgl_tempo").flatpickr({
             altInput: true,
             altFormat: "j F Y",

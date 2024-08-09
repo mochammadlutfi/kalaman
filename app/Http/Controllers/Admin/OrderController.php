@@ -33,6 +33,12 @@ class OrderController extends Controller
                 ->editColumn('tgl', function ($row) {
                     return Carbon::parse($row->tgl)->translatedformat('d M Y');
                 })
+                ->editColumn('durasi', function ($row) {
+                    return $row->durasi .' Bulan';
+                })
+                ->addColumn('tgl_selesai', function ($row) {
+                    return Carbon::parse($row->tgl)->addMonth($row->durasi)->translatedformat('d M Y');
+                })
                 ->editColumn('status', function ($row) {
                     if($row->status == 'draft'){
                         return '<span class="badge bg-warning">Draft</span>';
@@ -42,7 +48,7 @@ class OrderController extends Controller
                         return '<span class="badge bg-danger">Tutup</span>';
                     }
                 })
-                ->rawColumns(['action', 'status']) 
+                ->rawColumns(['action', 'status', 'tgl_selesai']) 
                 ->make(true);
         }
         return view('admin.order.index');
@@ -282,12 +288,6 @@ class OrderController extends Controller
     
     public function select(Request $request)
     {
-        // dd($request->user_id);
-        // if(!isset($request->searchTerm)){
-        //     $fetchData = Order::
-        //     orderBy('created_at', 'DESC')
-        //     ->get();
-        //   }else{
             $cari = $request->searchTerm;
             $user_id = $request->user_id;
             $fetchData = Order::

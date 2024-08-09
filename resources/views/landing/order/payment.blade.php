@@ -49,7 +49,7 @@
                                     <x-input-field type="text" id="tgl" name="tgl" label="Tanggal" :required="true" isAjax/>
                                 </div>
                                 <div class="col-md-6">
-                                    <x-input-field type="text" id="jumlah" name="jumlah" label="Jumlah" :required="true" isAjax/>
+                                    <x-input-field type="text" id="jumlah" name="jumlah" label="Jumlah" value="{{ $data->total }}" :required="true" isAjax/>
                                 </div>
                             </div>
                             <div class="mb-4">

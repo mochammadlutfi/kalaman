@@ -32,7 +32,7 @@ class UserController extends Controller
                             Aksi
                         </button>
                         <div class="dropdown-menu fs-sm" aria-labelledby="dropdown-default-outline-primary" style="">';
-                        $btn .= '<a class="dropdown-item" href="'. route('admin.user.riwayat', $row->id).'"><i class="si si-list me-1"></i>Riwayat Training</a>';
+                        $btn .= '<a class="dropdown-item" href="'. route('admin.user.riwayat', $row->id).'"><i class="si si-list me-1"></i>Riwayat Pesanan</a>';
                         $btn .= '<a class="dropdown-item" href="'. route('admin.user.edit', $row->id).'"><i class="si si-note me-1"></i>Ubah</a>';
                         $btn .= '<a class="dropdown-item" href="javascript:void(0)" onclick="hapus('. $row->id.')"><i class="si si-trash me-1"></i>Hapus</a>';
                     $btn .= '</div></div>';
