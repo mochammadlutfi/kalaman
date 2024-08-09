@@ -152,7 +152,7 @@
             aria-labelledby="modal-show"
             style="display: none;"
             aria-hidden="true">
-            <div class="modal-dialog" role="document">
+            <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <form id="form-payment"  onsubmit="return false;" enctype="multipart/form-data">
                         <div class="block block-rounded shadow-none mb-0">
@@ -168,7 +168,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <div class="block-content fs-sm" id="detailPembayaran">
+                            <div id="detailPembayaran">
                             </div>
                         </div>
                     </form>
@@ -260,30 +260,29 @@
             });
         }
 
-        
-        function updateStatus(id, status, booking_id){
-            // console.log(status);
-            $.ajax({
-                url: "/admin/pembayaran/"+id +"/status",
-                type: "POST",
-                data : {
-                    booking_id : booking_id,
-                    status : status,
-                    _token : $("meta[name='csrf-token']").attr("content"),
-                },
-                success: function (response) {
-                    // console.log(response);
-                    location.reload();
-                    var el = document.getElementById('modal-show');
-                    $('.datatable').DataTable().ajax.reload();
-                    // $("#detailPembayaran").html(response);
-                    var myModal = bootstrap.Modal.getOrCreateInstance(el);
-                    myModal.hide();
-                },
-                error: function (error) {
-                }
-            });
-        }
+        function updateStatus(id, status){
+                // console.log(status);
+                $.ajax({
+                    url: "/admin/pembayaran/"+id +"/status",
+                    type: "POST",
+                    data : {
+                        status : status,
+                        _token : $("meta[name='csrf-token']").attr("content"),
+                    },
+                    success: function (response) {
+                        // console.log(response);
+                        location.reload();
+                        var el = document.getElementById('modal-show');
+                        $('.datatable').DataTable().ajax.reload();
+                        // $("#detailPembayaran").html(response);
+                        var myModal = bootstrap.Modal.getOrCreateInstance(el);
+                        myModal.hide();
+                    },
+                    error: function (error) {
+                    }
+                });
+            }
+            
 
         $("#form-payment").on("submit",function (e) {
             e.preventDefault();

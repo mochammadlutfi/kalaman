@@ -72,6 +72,7 @@
             <div class="modal-content">
                 <form id="formData" onsubmit="return false;" enctype="multipart/form-data">
                     <div class="block block-rounded shadow-none mb-0">
+                        <input type="hidden" name="project_id" value="{{  $data->id }}"/>
                         <div class="block-header bg-gd-dusk">
                             <h3 class="block-title text-white" id="modalFormTitle">Tugas</h3>
                             <div class="block-options">
@@ -209,11 +210,35 @@
 
         function edit(data){
             var modalForm = bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-form'));
-            $("#modalFormTitle").html('Ubah Tugas');
             modalForm.show();
         }
 
-        
+
+        function edit(id){
+            $.ajax({
+                url: `/admin/task/${id}/edit`,
+                type: "GET",
+                dataType: "json",
+                success: function (response) {
+                    $('#field-id').val(response.id);
+                    $('#field-nama').val(response.nama);
+                    $('#field-tgl_tempo').val(response.tgl_tempo);
+                    $('#field-status').val(response.status);
+                    $('#field-link_brief').val(response.link_brief);
+                    $('#field-tgl_upload').val(response.tgl_upload);
+                    $('#field-status').val(response.status);
+                    $('#field-status_upload').val(response.status_upload);
+                    $("#modalFormTitle").html('Ubah Tugas');
+                    var el = document.getElementById('modal-form');
+                    var myModal = bootstrap.Modal.getOrCreateInstance(el);
+                    myModal.show();
+                },
+                error: function (error) {
+                }
+
+            });
+            }
+
         $("#field-tgl_tempo").flatpickr({
             altInput: true,
             altFormat: "j F Y",
@@ -283,8 +308,12 @@
             let token   = $("meta[name='csrf-token']").attr("content");
             formData.append('_token', token);
 
+            let id = $('#field-id').val();
+
+            let url = (id) ? `/admin/task/${id}/update` : `/admin/task/simpan`;
+
             $.ajax({
-                url: "{{ route('admin.task.store') }}",
+                url: url,
                 type: "POST",
                 data: formData,
                 cache: false,
@@ -292,8 +321,8 @@
                 processData: false,
                 success: function (response) {
                     if (response.fail == false) {
-                        $('.datatable').DataTable().ajax.reload();
-                        var myModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-normal'));
+                        $('#tableTask').DataTable().ajax.reload();
+                        var myModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-form'));
                         myModal.hide();
                     } else {
                         for (control in response.errors) {
@@ -308,6 +337,61 @@
             });
 
         });
+
+        
+        function hapus(id){
+                Swal.fire({
+                    icon : 'warning',
+                    text: 'Hapus Data?',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Hapus!',
+                    cancelButtonText: `Tidak, Jangan!`,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "/admin/task/"+ id +"/delete",
+                            type: "DELETE",
+                            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                            success: function(data) {
+                                if(data.fail == false){
+                                    Swal.fire({
+                                        toast : true,
+                                        title: "Berhasil",
+                                        text: "Data Berhasil Dihapus!",
+                                        timer: 1500,
+                                        showConfirmButton: false,
+                                        icon: 'success',
+                                        position : 'top-end'
+                                    }).then((result) => {
+                                        $('#tableTask').DataTable().ajax.reload();
+                                    });
+                                }else{
+                                    Swal.fire({
+                                        toast : true,
+                                        title: "Gagal",
+                                        text: "Data Gagal Dihapus!",
+                                        timer: 1500,
+                                        showConfirmButton: false,
+                                        icon: 'error',
+                                        position : 'top-end'
+                                    });
+                                }
+                            },
+                            error: function(jqXHR, textStatus, errorThrown) {
+                                    Swal.fire({
+                                        toast : true,
+                                        title: "Gagal",
+                                        text: "Terjadi Kesalahan Di Server!",
+                                        timer: 1500,
+                                        showConfirmButton: false,
+                                        icon: 'error',
+                                        position : 'top-end'
+                                    });
+                            }
+                        });
+                    }
+                })
+            }
     </script>
     @endpush
 

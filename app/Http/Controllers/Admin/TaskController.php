@@ -40,7 +40,7 @@ class TaskController extends Controller
                         </button>
                         <div class="dropdown-menu fs-sm" aria-labelledby="dropdown-default-outline-primary" style="">';
                         $btn .= '<a class="dropdown-item" href="javascript:void(0)" onclick="detail('. $row->id .')"><i class="si si-eye me-1"></i>Detail</a>';
-                        $btn .= '<a class="dropdown-item" href="javascript:void(0)" onclick="ubah('. json_encode($row) .')"><i class="si si-note me-1"></i>Ubah</a>';
+                        $btn .= '<a class="dropdown-item" href="javascript:void(0)" onclick="edit('.$row->id.')"><i class="si si-note me-1"></i>Ubah</a>';
                         $btn .= '<a class="dropdown-item" href="javascript:void(0)" onclick="hapus('. $row->id.')"><i class="si si-trash me-1"></i>Hapus</a>';
                     $btn .= '</div></div>';
                     return $btn; 
@@ -120,14 +120,14 @@ class TaskController extends Controller
                 $data->link_brief = $request->link_brief;
                 $data->tgl_tempo = $request->tgl_tempo;
                 $data->tgl_upload = $request->tgl_upload;
-                $data->status = 'pending';
+                $data->status = $request->status;
                 $data->status_upload = 0;
 
-                // if($request->file){
-                //     $fileName = time() . '.' . $request->file->extension();
-                //     Storage::disk('public')->putFileAs('uploads/pembayaran', $request->file, $fileName);
-                //     $data->file = '/uploads/task/'.$fileName;
-                // }
+                if($request->file){
+                    $fileName = time() . '.' . $request->file->extension();
+                    Storage::disk('public')->putFileAs('uploads/pembayaran', $request->file, $fileName);
+                    $data->file = '/uploads/task/'.$fileName;
+                }
                 $data->save();
 
             }catch(\QueryException $e){
@@ -238,12 +238,9 @@ class TaskController extends Controller
      */
     public function edit($id)
     {
-        $data = Ekskul::where('id', $id)->first();
-        $pembina = User::where('level', 'pembina')->orderBy('nama', 'ASC')->get();
-        return view('ekskul.edit',[
-            'pembina' => $pembina,
-            'data' => $data
-        ]);
+        $data = Task::where('id', $id)->first();
+
+        return response()->json($data);
     }
 
     /**
@@ -258,61 +255,56 @@ class TaskController extends Controller
         // dd($request->all());
         $rules = [
             'nama' => 'required',
-            'pembina_id' => 'required',
-            'deskripsi' => 'required',
-            'tempat' => 'required',
-            'jadwal' => 'required',
-            'mulai' => 'required',
-            'selesai' => 'required',
+            'link_brief' => 'required',
+            'tgl_tempo' => 'required',
+            'tgl_upload' => 'required',
         ];
 
         $pesan = [
-            'nama.required' => 'Nama Wajib Diisi!',
-            'pembina_id.required' => 'Pembina Wajib Diisi!',
-            'deskripsi.required' => 'Deskripsi Wajib Diisi!',
-            'tempat.required' => 'Tempat Wajib Diisi!',
-            'mulai.required' => 'Jam Mulai Wajib Diisi!',
-            'selesai.required' => 'Jam Selesai Wajib Diisi!',
+            'nama.required' => 'Nama tugas harus diisi!',
+            'link_brief.required' => 'Link brief harus diisi!',
+            'tgl_tempo.required' => 'Tanggal tempo harus diisi!',
+            'tgl_upload.required' => 'Tanggal upload harus diisi!',
         ];
-
 
         $validator = Validator::make($request->all(), $rules, $pesan);
         if ($validator->fails()){
-            return back()->withInput()->withErrors($validator->errors());
+            return response()->json([
+                'fail' => true,
+                'errors' => $validator->errors()
+            ]);
         }else{
             DB::beginTransaction();
             try{
 
-                $data = Ekskul::where('id', $id)->first();
+                $data = Task::where('id', $id)->first();
+                $data->project_id = $request->project_id;
                 $data->nama = $request->nama;
-                $data->pembina_id = $request->pembina_id;
-                $data->deskripsi = $request->deskripsi;
-                $data->tempat = $request->tempat;
-                $data->jadwal = json_encode($request->jadwal);
-                $data->mulai = $request->mulai;
-                $data->selesai = $request->selesai;
+                $data->link_brief = $request->link_brief;
+                $data->tgl_tempo = $request->tgl_tempo;
+                $data->tgl_upload = $request->tgl_upload;
                 $data->status = $request->status;
-                if($request->foto){
-                    if(!empty($data->foto)){
-                        $cek = Storage::disk('public')->exists($data->foto);
-                        if($cek)
-                        {
-                            Storage::disk('public')->delete($data->foto);
-                        }
-                    }
-                    $fileName = time() . '.' . $request->foto->extension();
-                    Storage::disk('public')->putFileAs('uploads/ekskul', $request->foto, $fileName);
-                    $data->foto = '/uploads/ekskul/'.$fileName;
+                $data->status_upload = 0;
+
+                if($request->file){
+                    $fileName = time() . '.' . $request->file->extension();
+                    Storage::disk('public')->putFileAs('uploads/pembayaran', $request->file, $fileName);
+                    $data->file = '/uploads/task/'.$fileName;
                 }
                 $data->save();
 
             }catch(\QueryException $e){
                 DB::rollback();
-                back()->withInput()->withErrors($validator->errors());
+                return response()->json([
+                    'fail' => true,
+                    'errors' => $e
+                ]);
             }
 
             DB::commit();
-            return redirect()->route('ekskul.index');
+            return response()->json([
+                'fail' => false,
+            ]);
         }
     }
 
@@ -327,7 +319,7 @@ class TaskController extends Controller
         DB::beginTransaction();
         try{
 
-            $data = UserTraining::where('id', $id)->first();
+            $data = Task::where('id', $id)->first();
             $data->delete();
 
         }catch(\QueryException $e){
