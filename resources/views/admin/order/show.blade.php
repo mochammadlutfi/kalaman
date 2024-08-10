@@ -188,7 +188,7 @@
                 ajax: {
                     url : "{{ route('admin.payment.index') }}",
                     data : function(data){
-                        data.booking_id = "{{ $data->id }}";
+                        data.oder_id = "{{ $data->id }}";
                     },
                 },
                 columns: [
@@ -217,7 +217,12 @@
                     processing: true,
                     serverSide: true,
                     dom : "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>><'row'<'col-sm-12'tr>><'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
-                    ajax: "{{ route('admin.project.index') }}",
+                    ajax: {
+                        url :"{{ route('admin.project.index') }}",
+                        data : function(data){
+                            data.oder_id = "{{ $data->id }}";
+                        },
+                    },
                     columns: [
                         {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                         {data: 'nama', name: 'nama'},

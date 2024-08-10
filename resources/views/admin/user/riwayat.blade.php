@@ -1,21 +1,24 @@
 <x-app-layout>
-    <div class="content">
-        <div class="content-heading d-flex justify-content-between align-items-center">
-            <span>Riwayat Pelatihan</span>
-            <div class="space-x-1">
-
+    <div class="bg-gd-dusk">
+        <div class="content text-center">
+            <div class="py-6">
+                <h1 class="fw-bold text-white mb-2">Riwayat Pemesanan</h1>
             </div>
         </div>
+    </div>
+    <div class="content">
         <div class="block block-rounded">
             <div class="block-content p-3">
                 <table class="table table-bordered datatable w-100">
                     <thead>
                         <tr>
-                            <th width="60px">No</th>
-                            <th>Nomor</th>
-                            <th>Training</th>
-                            <th>Tanggal</th>
-                            <th>Status</th>
+                            <th width="300px">Nomor</th>
+                            <th width="400px">Konsumen</th>
+                            <th width="200px">Paket</th>
+                            <th width="200px">Tgl Pemesanan</th>
+                            <th width="200px">Durasi</th>
+                            <th width="200px">Tgl Selesai</th>
+                            <th width="60px">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -32,13 +35,25 @@
                     processing: true,
                     serverSide: true,
                     dom : "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>><'row'<'col-sm-12'tr>><'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
-                    ajax: "{{ route('admin.user.riwayat', $data->id) }}",
+                    ajax: {
+                        url :"{{ route('admin.order.index') }}",
+                        data : function(data){
+                            data.user_id = "{{ $data->id }}";
+                        },
+                    },
                     columns: [
-                        {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                         {data: 'nomor', name: 'nomor'},
-                        {data: 'training.nama', name: 'training.nama'},
+                        {data: 'user.nama', name: 'user.nama'},
+                        {data: 'paket.nama', name: 'paket.nama'},
                         {data: 'tgl', name: 'tgl'},
-                        {data: 'training.status', name: 'training.status'},
+                        {data: 'durasi', name: 'durasi'},
+                        {data: 'tgl_selesai', name: 'tgl_selesai'},
+                        {
+                            data: 'action', 
+                            name: 'action', 
+                            orderable: true, 
+                            searchable: true
+                        },
                     ]
                 });
             });

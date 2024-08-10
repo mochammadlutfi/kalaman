@@ -66,7 +66,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: "/admin/pelanggan/"+ id +"/delete",
+                        url: "/admin/konsumen/"+ id +"/delete",
                         type: "DELETE",
                         headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                         success: function(data) {

@@ -22,7 +22,11 @@ class ProjectController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = Project::with(['user', 'order'])->withCount('task')->latest()->get();
+            $order_id = $request->order_id;
+            $data = Project::with(['user', 'order'])->withCount('task')
+            ->when(!empty($order_id), function($q) use ($order_id) {
+                return $q->where('order_id', $order_id);
+            })->latest()->get();
 
             return DataTables::of($data)
                 ->addIndexColumn()

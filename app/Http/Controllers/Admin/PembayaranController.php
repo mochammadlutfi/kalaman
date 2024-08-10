@@ -23,9 +23,13 @@ class PembayaranController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
+            $order_id = $request->order_id;
             $data = Pembayaran::with(['order' => function($q){
                 return $q->with('user');
             }])
+            ->when(!empty($order_id), function($q) use ($order_id) {
+                return $q->where('order_id', $order_id);
+            })
             ->orderBy('id', 'DESC')->get();
 
             return DataTables::of($data)

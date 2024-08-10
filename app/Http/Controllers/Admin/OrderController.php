@@ -22,7 +22,12 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = Order::with(['user', 'paket'])->latest()->get();
+            $user_id = $request->user_id;
+            $data = Order::with(['user', 'paket'])
+            ->when(!empty($user_id), function($q) use ($user_id) {
+                return $q->where('user_id', $user_id);
+            })
+            ->latest()->get();
 
             return DataTables::of($data)
                 ->addIndexColumn()
