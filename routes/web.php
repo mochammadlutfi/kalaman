@@ -94,6 +94,7 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function(){
                 Route::post('/store','OrderController@store')->name('store');
                 Route::post('/status','OrderController@status')->name('status');
                 Route::post('/select','OrderController@select')->name('select');
+                Route::get('/report','OrderController@report')->name('report');
                 Route::get('/json','OrderController@json')->name('json');
                 Route::get('/{id}','OrderController@show')->name('show');
                 Route::get('/{id}/edit','OrderController@edit')->name('edit');
@@ -155,6 +156,7 @@ Route::prefix('/admin')->name('admin.')->namespace('Admin')->group(function(){
                 Route::get('/','PembayaranController@index')->name('index');
                 Route::get('/create','PembayaranController@create')->name('create');
                 Route::post('/store','PembayaranController@store')->name('store');
+                Route::get('/report','PembayaranController@report')->name('report');
                 Route::get('/{id}','PembayaranController@show')->name('show');
                 Route::get('/{id}/edit','PembayaranController@edit')->name('edit');
                 Route::post('{id}/update','PembayaranController@update')->name('update');

@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Storage;
 use Carbon\Carbon;
 use App\Models\Order;
-
+use PDF;
 
 class OrderController extends Controller
 {
@@ -322,5 +322,25 @@ class OrderController extends Controller
         }
 
           return response()->json($data);
+    }
+
+    public function report(Request $request)
+    {
+        $tgl = explode(" - ",$request->tgl);
+        $data = Order::with(['user', 'paket'])
+        ->withCount('project')
+        ->whereBetween('tgl', $tgl)
+        ->latest()->get();
+        $config = [
+            'format' => 'A4-L' // Landscape
+        ];
+
+        $pdf = PDF::loadView('reports.order', [
+            'data' => $data,
+            'tgl' =>$tgl
+        ], [ ], $config);
+
+        return $pdf->stream('Laporan Pesanan.pdf');
+
     }
 }

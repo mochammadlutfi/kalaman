@@ -19,6 +19,10 @@ class Order extends Model
     }
 
     
+    public function project(){
+        return $this->hasMany(Project::class, 'order_id');
+    }
+
     public function paket(){
         return $this->belongsTo(Paket::class, 'paket_id');
     }

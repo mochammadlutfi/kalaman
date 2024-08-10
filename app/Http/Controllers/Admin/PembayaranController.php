@@ -9,7 +9,7 @@ use Illuminate\Routing\Controller;
 use Carbon\Carbon;
 use Storage;
 use DataTables;
-
+use PDF;
 use App\Models\User;
 use App\Models\Pembayaran;
 
@@ -403,5 +403,33 @@ class PembayaranController extends Controller
         }else{
             return $code . date('ym') .'/'. sprintf("%05s", $no);
         }
+    }
+    
+    public function report(Request $request)
+    {
+        $tgl = explode(" - ",$request->tgl);
+        $status = $request->status;
+
+        $data = Pembayaran::with(['order' => function($q){
+            return $q->with('user');
+        }])
+        ->when(!empty($status), function($q) use ($status) {
+            return $q->where('status', $status);
+        })
+        ->whereBetween('tgl', $tgl)
+        ->orderBy('id', 'DESC')->get();
+
+        
+        $config = [
+            'format' => 'A4-L' // Landscape
+        ];
+
+        $pdf = PDF::loadView('reports.pembayaran', [
+            'data' => $data,
+            'tgl' =>$tgl
+        ], [ ], $config);
+
+        return $pdf->stream('Laporan Pembayaran'. $request->tgl .'.pdf');
+
     }
 }
