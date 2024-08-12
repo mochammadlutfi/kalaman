@@ -50,7 +50,6 @@
                             <tr>
                                 <th width="60px">No</th>
                                 <th width="200px">Nama</th>
-                                <th width="300px">Konsumen</th>
                                 <th width="200px">No Pesanan</th>
                                 <th width="200px">Total Tugas</th>
                                 <th width="60px">Aksi</th>
@@ -223,7 +222,12 @@
                     processing: true,
                     serverSide: true,
                     dom : "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>><'row'<'col-sm-12'tr>><'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
-                    ajax: "{{ route('user.project', $data->id) }}",
+                    ajax: {
+                        url : "{{ route('user.project', $data->id) }}",
+                        data : function(data){
+
+                        },
+                    },
                     columns: [
                         {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                         {data: 'nama', name: 'nama'},

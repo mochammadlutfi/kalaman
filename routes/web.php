@@ -49,6 +49,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/pesanan/{id}/pembayaran','OrderController@payment')->name('user.order.payment');
     Route::get('/pesanan/{id}/pembayaran/data','OrderController@paymentData')->name('user.order.payment.data');
     Route::get('/pesanan/{id}/project','ProjectController@index')->name('user.project');
+    Route::get('/pesanan/{id}/project/{project}','ProjectController@show')->name('user.project.show');
+    Route::get('/pesanan/{id}/project/{project}/task','ProjectController@task')->name('user.project.task');
+    Route::get('/pesanan/{id}/project/{project}/kalender','ProjectController@calendar')->name('user.project.calendar');
     Route::post('/pesanan/{id}/update','OrderController@update')->name('user.order.update');    
 
     
