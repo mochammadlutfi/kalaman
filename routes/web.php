@@ -42,6 +42,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/password','ProfilController@password')->name('password');
         Route::post('/password','ProfilController@updatePassword');
     });
+    Route::post('/task/{id}/status','ProjectController@status')->name('user.project.status');
         
     Route::get('/pesanan-saya','OrderController@user')->name('user.order');
     Route::get('/pesanan-saya/{id}','OrderController@show')->name('user.order.show');

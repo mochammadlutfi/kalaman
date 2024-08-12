@@ -55,8 +55,8 @@
                                         <span class="badge bg-warning">Pending</span>
                                     @elseif($d->status == 'Selesai')
                                         <span class="badge bg-primary">Selesai</span>
-                                    @elseif($d->status == 'Setuju')
-                                        <span class="badge bg-success">Setuju</span>
+                                    @elseif($d->status == 'Disetujui')
+                                        <span class="badge bg-success">Disetujui</span>
                                     @elseif($d->status == 'Ditolak')
                                         <span class="badge bg-secondary">Ditolak</span>
                                     @endif
@@ -70,76 +70,15 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <button type="button" class="btn btn-sm btn-gd-main" onclick="detail({{json_encode($d)}})">
-                                        Detail
+                                    <button type="button" class="btn btn-gd-main" data-bs-toggle="modal" data-bs-target="#modalShow-{{$d->id}}">
+                                      Detail
                                     </button>
+                                    <x-task-detail id="modalShow-{{$d->id}}" :data="$d"/>
                                 </td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
-            </div>
-        </div>
-    </div>
-    <div class="modal" id="modal-show" aria-labelledby="modal-show" style="display: none;" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="block block-rounded shadow-none mb-0">
-                    <div class="block-header bg-gd-dusk">
-                        <h3 class="block-title text-white">Detail Tugas</h3>
-                        <div class="block-options">
-                            <button type="button" class="text-white btn-block-option" data-bs-dismiss="modal" aria-label="Close">
-                                <i class="fa fa-times"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="block-content p-4">
-                        <div class="row mb-3">
-                            <div class="col-md-8">
-                                <div class="row mb-3 fs-sm">
-                                    <label class="col-sm-5 fw-medium">Nama Tugas</label>
-                                    <div class="col-sm-7">: wq</div>
-                                </div>
-                                <div class="row mb-3">
-                                    <label class="col-sm-5 fw-medium">Link Brief</label>
-                                    <div class="col-sm-7">: 
-                                        <a href="wq" target="_blank" class="badge bg-primary px-3 text-white">Lihat Brief</a>
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <label class="col-sm-5 fw-medium">Status</label>
-                                    <div class="col-sm-7">: <span class="badge bg-primary">Pending</span></div>
-                                </div>
-                                <div class="row mb-3">
-                                    <label class="col-sm-5 fw-medium">Tanggal Tempo</label>
-                                    <div class="col-sm-7">
-                                        : 12 Agustus 2024
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <label class="col-sm-5 fw-medium">Tanggal Upload</label>
-                                    <div class="col-sm-7">
-                                        : 12 Agustus 2024 19:51 WIB
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <label class="col-sm-5 fw-medium">Status Upload</label>
-                                    <div class="col-sm-7">: <span class="badge bg-danger">Belum Upload</span></div>
-                                </div>
-                                <div class="row mb-3">
-                                    <label class="col-sm-5 fw-medium">File Task</label>
-                                    <div class="col-sm-7">: 
-                                        <a href="/uploads/task/1723467085.jpg" target="_blank" class="badge bg-primary px-3 text-white">
-                                            Lihat File
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="block-content">
-                    </div>
-                </div>
             </div>
         </div>
     </div>

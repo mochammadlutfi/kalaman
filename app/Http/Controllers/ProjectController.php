@@ -150,5 +150,27 @@ class ProjectController extends Controller
         ]);
     }
 
+
+    public function status($id, Request $request)
+    {
+        
+        DB::beginTransaction();
+        try{
+
+            $data = Task::where('id', $id)->first();
+            $data->keterangan = $request->keterangan;
+            $data->status = $request->status;
+            $data->save();
+
+        }catch(\QueryException $e){
+            DB::rollback();
+            back()->withInput()->withErrors($validator->errors());
+        }
+
+        DB::commit();
+
+        return redirect()->back();
+    }
+
     
 }
