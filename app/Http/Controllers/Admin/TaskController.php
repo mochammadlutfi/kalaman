@@ -55,16 +55,16 @@ class TaskController extends Controller
                     return $tgl->translatedFormat('d F Y H:i');
                 })
                 ->editColumn('status', function ($row) {
-                    if($row->status == 'belum bayar'){
-                        return '<span class="badge bg-danger">Belum Bayar</span>';
-                    }else if($row->status == 'sebagian'){
-                        return '<span class="badge bg-warning">Sebagian</span>';
-                    }else if($row->status == 'pending'){
-                        return '<span class="badge bg-primary">Pending</span>';
-                    }else if($row->status == 'lunas'){
-                        return '<span class="badge bg-success">Lunas</span>';
-                    }else if($row->status == 'batal'){
-                        return '<span class="badge bg-secondary">Batal</span>';
+                    if($row->status == 'Draft'){
+                        return '<span class="badge bg-danger">Draft</span>';
+                    }else if($row->status == 'Pending'){
+                        return '<span class="badge bg-warning">Pending</span>';
+                    }else if($row->status == 'Selesai'){
+                        return '<span class="badge bg-primary">Selesai</span>';
+                    }else if($row->status == 'Setuju'){
+                        return '<span class="badge bg-success">Setuju</span>';
+                    }else if($row->status == 'Ditolak'){
+                        return '<span class="badge bg-secondary">Ditolak</span>';
                     }
                 })
                 ->editColumn('status_upload', function ($row) {
@@ -155,13 +155,14 @@ class TaskController extends Controller
     {
         $data = Task::where('id', $id)->first();
 
-        if($data->status == 'pending'){
+        if($data->status == 'Pending'){
             $status = '<span class="badge bg-primary">Pending</span>';
-        }else if($data->status == 'terima'){
+        }else if($data->status == 'Selesai'){
             $status = '<span class="badge bg-success">Diterima</span>';
-        }else if($data->status == 'tolak'){
+        }else{
             $status = '<span class="badge bg-secondary">Ditolak</span>';
         }
+        
         if($data->status_upload){
             $status_upload = '<span class="badge bg-primary">Sudah Upload</span>';
         }else {
@@ -170,7 +171,7 @@ class TaskController extends Controller
 
         $html = '<div class="block-content p-4">
             <div class="row mb-3">
-                <div class="col-md-6">
+                <div class="col-md-12">
                     <div class="row mb-3">
                         <label class="col-sm-5 fw-medium">Nama Tugas</label>
                         <div class="col-sm-7">: '. $data->nama .'</div>
@@ -200,6 +201,14 @@ class TaskController extends Controller
                     <div class="row mb-3">
                         <label class="col-sm-5 fw-medium">Status Upload</label>
                         <div class="col-sm-7">: '. $status_upload .'</div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-5 fw-medium">File Task</label>
+                        <div class="col-sm-7">: 
+                            <a href="'. $data->file .'" target="_blank" class="badge bg-primary px-3 text-white">
+                                Lihat File
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

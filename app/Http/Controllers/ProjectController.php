@@ -79,9 +79,13 @@ class ProjectController extends Controller
     {
         $user = auth()->guard('web')->user();
         $data = Project::where('id', $project)->first();
+        $task = Task::with(['project'])
+        ->where('project_id', $project)
+        ->orderBy('id', 'DESC')->get();
 
         return view('landing.order.project', [
             'data' => $data,
+            'task' =>  $task
         ]);
     }
     
@@ -118,16 +122,16 @@ class ProjectController extends Controller
                     return $tgl->translatedFormat('d F Y H:i');
                 })
                 ->editColumn('status', function ($row) {
-                    if($row->status == 'belum bayar'){
-                        return '<span class="badge bg-danger">Belum Bayar</span>';
-                    }else if($row->status == 'sebagian'){
-                        return '<span class="badge bg-warning">Sebagian</span>';
-                    }else if($row->status == 'pending'){
-                        return '<span class="badge bg-primary">Pending</span>';
-                    }else if($row->status == 'lunas'){
-                        return '<span class="badge bg-success">Lunas</span>';
-                    }else if($row->status == 'batal'){
-                        return '<span class="badge bg-secondary">Batal</span>';
+                    if($row->status == 'Draft'){
+                        return '<span class="badge bg-danger">Draft</span>';
+                    }else if($row->status == 'Pending'){
+                        return '<span class="badge bg-warning">Pending</span>';
+                    }else if($row->status == 'Selesai'){
+                        return '<span class="badge bg-primary">Selesai</span>';
+                    }else if($row->status == 'Setuju'){
+                        return '<span class="badge bg-success">Setuju</span>';
+                    }else if($row->status == 'Ditolak'){
+                        return '<span class="badge bg-secondary">Ditolak</span>';
                     }
                 })
                 ->editColumn('status_upload', function ($row) {

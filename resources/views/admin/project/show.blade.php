@@ -13,7 +13,7 @@
                         <i class="si si-calendar me-1"></i>
                         Kalender
                     </a>
-                    <button type="button" class="btn rounded-pill btn-alt-danger">
+                    <button type="button" class="btn rounded-pill btn-alt-danger" onclick="hapus()">
                         <i class="si si-trash me-1"></i>
                         Hapus
                     </button>

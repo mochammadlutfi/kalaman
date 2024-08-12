@@ -190,6 +190,10 @@ class OrderController extends Controller
 
                     return $btn; 
                 })
+                ->editColumn('durasi', function ($row) {
+
+                    return $row->durasi .' Bulan';
+                })
                 ->editColumn('tgl', function ($row) {
                     return Carbon::parse($row->tgl)->translatedformat('d M Y');
                 })

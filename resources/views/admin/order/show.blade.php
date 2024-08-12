@@ -220,7 +220,7 @@
                     ajax: {
                         url :"{{ route('admin.project.index') }}",
                         data : function(data){
-                            data.oder_id = "{{ $data->id }}";
+                            data.order_id = "{{ $data->id }}";
                         },
                     },
                     columns: [
