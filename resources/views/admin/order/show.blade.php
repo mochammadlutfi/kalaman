@@ -8,7 +8,7 @@
                         <i class="fa fa-edit me-1"></i>
                         Ubah
                     </a>
-                    <button type="button" class="btn rounded-pill btn-alt-danger">
+                    <button type="button" class="btn rounded-pill btn-alt-danger" onclick="hapus()">
                         <i class="fa fa-close me-1"></i>
                         Hapus
                     </button>
@@ -289,6 +289,60 @@
             }
             
 
+            function hapus(){
+                Swal.fire({
+                    icon : 'warning',
+                    text: 'Hapus Data?',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Hapus!',
+                    cancelButtonText: `Tidak, Jangan!`,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{ route('admin.order.delete', $data->id )}}",
+                            type: "DELETE",
+                            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                            success: function(data) {
+                                if(data.fail == false){
+                                    Swal.fire({
+                                        toast : true,
+                                        title: "Berhasil",
+                                        text: "Data Berhasil Dihapus!",
+                                        timer: 1500,
+                                        showConfirmButton: false,
+                                        icon: 'success',
+                                        position : 'top-end'
+                                    }).then((result) => {
+                                        // $('#tableTask').DataTable().ajax.reload();
+                                        window.location = "{{ route('admin.order.index') }}";
+                                    });
+                                }else{
+                                    Swal.fire({
+                                        toast : true,
+                                        title: "Gagal",
+                                        text: "Data Gagal Dihapus!",
+                                        timer: 1500,
+                                        showConfirmButton: false,
+                                        icon: 'error',
+                                        position : 'top-end'
+                                    });
+                                }
+                            },
+                            error: function(jqXHR, textStatus, errorThrown) {
+                                    Swal.fire({
+                                        toast : true,
+                                        title: "Gagal",
+                                        text: "Terjadi Kesalahan Di Server!",
+                                        timer: 1500,
+                                        showConfirmButton: false,
+                                        icon: 'error',
+                                        position : 'top-end'
+                                    });
+                            }
+                        });
+                    }
+                })
+            }
         $("#form-payment").on("submit",function (e) {
             e.preventDefault();
             var fomr = $('form#form-payment')[0];

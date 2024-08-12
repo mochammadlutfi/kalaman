@@ -24,7 +24,7 @@ class ProjectController extends Controller
         if ($request->ajax()) {
             $order_id = $request->order_id;
             $data = Project::with(['user', 'order'])->withCount('task')
-            ->when(!empty($order_id), function($q) use ($order_id) {
+            ->when($order_id, function($q) use ($order_id) {
                 return $q->where('order_id', $order_id);
             })->latest()->get();
 
