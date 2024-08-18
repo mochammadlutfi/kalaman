@@ -61,12 +61,12 @@ class TaskController extends Controller
                         return '<span class="badge bg-warning">Pending</span>';
                     }else if($row->status == 'Selesai'){
                         return '<span class="badge bg-primary">Selesai</span>';
-                    }else if($row->status == 'Setuju'){
+                    }else if($row->status == 'Disetujui'){
                         return '<span class="badge bg-success">Setuju</span>';
                     }else if($row->status == 'Ditolak'){
                         return '<span class="badge bg-secondary">Ditolak</span>';
                     }
-                })
+                }) 
                 ->editColumn('status_upload', function ($row) {
                     if($row->status_upload == 0){
                         return '<span class="badge bg-danger">Belum Upload</span>';
@@ -125,7 +125,7 @@ class TaskController extends Controller
 
                 if($request->file){
                     $fileName = time() . '.' . $request->file->extension();
-                    Storage::disk('public')->putFileAs('uploads/pembayaran', $request->file, $fileName);
+                    Storage::disk('public')->putFileAs('uploads/task', $request->file, $fileName);
                     $data->file = '/uploads/task/'.$fileName;
                 }
                 $data->save();
@@ -297,7 +297,7 @@ class TaskController extends Controller
 
                 if($request->file){
                     $fileName = time() . '.' . $request->file->extension();
-                    Storage::disk('public')->putFileAs('uploads/pembayaran', $request->file, $fileName);
+                    Storage::disk('public')->putFileAs('uploads/task', $request->file, $fileName);
                     $data->file = '/uploads/task/'.$fileName;
                 }
                 $data->save();
